@@ -20,7 +20,7 @@ const factorial = (a) => {
   for (let i = 1; i <= a ; i++) {
     b *= i
   }
-  return b
+  return Number(b.toPrecision(3))
 }
 
 // QUERYSELECTORS
@@ -82,9 +82,9 @@ delete_button.addEventListener("click", deleteLast)
 clear_button.addEventListener("click", clear)
 // open_button.addEventListener("click", function)
 // close_button.addEventListener("click", function)
-// exponent_button.addEventListener("click", function)
+exponent_button.addEventListener("click", currentNumberToExponent)
 // root_button.addEventListener("click", function)
-// factorial_button.addEventListener("click", function)
+factorial_button.addEventListener("click", currentNumberToFactorial)
 
 document.addEventListener("keydown", (event) => {keyClick(event)})
 
@@ -114,6 +114,23 @@ const buildNextNumber = (value) => {
   inputToScreen(value)
 }
 
+const waitForOperator = () => {
+  buttons.forEach((button) => {
+    if (!validOperators.includes(button.value)) {
+      button.disabled = true
+    } else if (!["%","s","^","!"].includes(button.value)){
+      button.addEventListener("click", enableAllButtons)
+    }
+  })
+}
+
+const enableAllButtons = () => {
+  buttons.forEach((button) => {
+    button.disabled = false
+    button.removeEventListener("click", enableAllButtons)
+  })
+}
+
 function validateZero() {
   if (currentNumber.length >= 1) {
     buildCurrentNumber("0")
@@ -138,6 +155,25 @@ function currentNumberToPercent() {
   let curNumStr = currentNumber
   currentNumber = String(percent(Number(curNumStr)))
   screen.textContent = screen.textContent.slice(0, curEquLen - curNumLen) + currentNumber
+  waitForOperator()
+}
+
+function currentNumberToExponent() {
+  const curNumLen = currentNumber.length
+  const curEquLen = screen.textContent.length
+  let curNumStr = currentNumber
+  currentNumber = String(exponent(Number(curNumStr)))
+  screen.textContent = screen.textContent.slice(0, curEquLen - curNumLen) + currentNumber
+  waitForOperator()
+}
+
+function currentNumberToFactorial() {
+  const curNumLen = currentNumber.length
+  const curEquLen = screen.textContent.length
+  let curNumStr = currentNumber
+  currentNumber = String(factorial(Number(curNumStr)))
+  screen.textContent = screen.textContent.slice(0, curEquLen - curNumLen) + currentNumber
+  waitForOperator()
 }
 
 function currentNumberSignChange() {
@@ -181,4 +217,5 @@ let currentNumber = ""
 const numbers = []
 const equations = []
 const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r",] //MEM, M+, M
+const validOperators = ["+","-","*","/","=","%","(",")","^","!","backspace","delete","enter","s","r"]
 

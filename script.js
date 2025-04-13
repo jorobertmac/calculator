@@ -26,6 +26,7 @@ const factorial = (a) => {
 // QUERYSELECTORS
 const screen = document.querySelector("#screen")
 const memory = document.querySelector("#memory")
+const buttons = document.querySelectorAll("button")
 const number0_button = document.querySelector("#number0")
 const number1_button = document.querySelector("#number1")
 const number2_button = document.querySelector("#number2")
@@ -57,35 +58,47 @@ const factorial_button = document.querySelector("#factorial")
 
 // ADDEVENTLISTENERS
 number0_button.addEventListener("click", validateZero)
-number1_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.value)})
-number2_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.value)})
-number3_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.value)})
-number4_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.value)})
-number5_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.value)})
-number6_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.value)})
-number7_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.value)})
-number8_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.value)})
-number9_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.value)})
-add_button.addEventListener("click", (event) => {buildNextNumber(event.target.value)})
-subtract_button.addEventListener("click", (event) => {buildNextNumber(event.target.value)})
-multiply_button.addEventListener("click", (event) => {buildNextNumber(event.target.value)})
-divide_button.addEventListener("click", (event) => {buildNextNumber(event.target.value)})
+number1_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
+number2_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
+number3_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
+number4_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
+number5_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
+number6_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
+number7_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
+number8_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
+number9_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
+add_button.addEventListener("click", (event) => {buildNextNumber(event.target.textContent)})
+subtract_button.addEventListener("click", (event) => {buildNextNumber(event.target.textContent)})
+multiply_button.addEventListener("click", (event) => {buildNextNumber(event.target.textContent)})
+divide_button.addEventListener("click", (event) => {buildNextNumber(event.target.textContent)})
 decimal_button.addEventListener("click", validateDecimal)
 equals_button.addEventListener("click", equals)
 percent_button.addEventListener("click", currentNumberToPercent)
 sign_button.addEventListener("click", currentNumberSignChange)
-// memoryCall_button.addEventListener("click", (event) => {inputToScreen(event.target)})
-// memoryAdd_button.addEventListener("click", (event) => {inputToScreen(event.target)})
-// memoryCycle_button.addEventListener("click", (event) => {inputToScreen(event.target)})
+// memoryCall_button.addEventListener("click", function)
+// memoryAdd_button.addEventListener("click", function)
+// memoryCycle_button.addEventListener("click", function)
 delete_button.addEventListener("click", deleteLast)
 clear_button.addEventListener("click", clear)
-// open_button.addEventListener("click", (event) => {inputToScreen(event.target)})
-// close_button.addEventListener("click", (event) => {inputToScreen(event.target)})
-// exponent_button.addEventListener("click", (event) => {inputToScreen(event.target)})
-// root_button.addEventListener("click", (event) => {inputToScreen(event.target)})
-// factorial_button.addEventListener("click", (event) => {inputToScreen(event.target)})
+// open_button.addEventListener("click", function)
+// close_button.addEventListener("click", function)
+// exponent_button.addEventListener("click", function)
+// root_button.addEventListener("click", function)
+// factorial_button.addEventListener("click", function)
+
+document.addEventListener("keydown", (event) => {keyClick(event)})
 
 // FUNCTIONS
+const keyClick = (keyPressed) => {
+  const key = keyPressed.key.toLowerCase()
+  if (validKeys.includes(key)) {
+    buttons.forEach((button) => {
+      if (key === button.value) {
+        button.click()
+      }
+    })
+  } 
+}
 const inputToScreen = (value) => {
   screen.textContent += value
 }
@@ -167,3 +180,5 @@ function equals() {
 let currentNumber = ""
 const numbers = []
 const equations = []
+const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r",] //MEM, M+, M
+

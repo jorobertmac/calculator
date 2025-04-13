@@ -99,6 +99,7 @@ const keyClick = (keyPressed) => {
     })
   } 
 }
+
 const inputToScreen = (value) => {
   screen.textContent += value
 }
@@ -202,20 +203,70 @@ function clear() {
   }
 }
 
-function evaluate() {
-  let evaluation = "01134"
-  return evaluation
+function evaluate(equation) {
+  let newEquation = [...equation]
+  newEquation = evaluateMulDiv(newEquation)
+  newEquation = evaluateAddSub(newEquation)
+  return newEquation
+}
+
+function evaluateMulDiv(equation) {
+  let result = []
+  for (let i = 0; i < equation.length; i++) {
+    if (equation[i] === "*" || equation[i] === "/") {
+      const leftNumber = Number(result[result.length - 1])
+      const rightNumber = Number(equation[i + 1])
+
+      result.pop()
+
+      if (equation[i] === "*") {
+        result.push(multiply(leftNumber, rightNumber))
+      } else {
+        result.push(divide(leftNumber, rightNumber))
+      }
+      i++
+    } else {
+      result.push(equation[i])
+    }
+  }
+  equation.length = 0
+  return equation = [...result]
+}
+
+function evaluateAddSub(equation) {
+  let result = []
+  for (let i = 0; i < equation.length; i++) {
+    if (equation[i] === "+" || equation[i] === "-") {
+      const leftNumber = Number(result[result.length - 1])
+      const rightNumber = Number(equation[i + 1])
+
+      result.pop()
+
+      if (equation[i] === "+") {
+        result.push(add(leftNumber, rightNumber))
+      } else {
+        result.push(subtract(leftNumber, rightNumber))
+      }
+      i++
+    } else {
+      result.push(equation[i])
+    }
+  }
+  equation.length = 0
+  return equation = [...result]
 }
 
 function equals() {
   numbers.push(Number(currentNumber))
   currentNumber = ""
   screen.textContent = evaluate()
+
 }
 
 let currentNumber = ""
+let currentEquation = 0
 const numbers = []
-const equations = []
+const equations = [["25","+","5","*","(","6","+","3",")","5","-","16","/","2"]]
 const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r",] //MEM, M+, M
 const validOperators = ["+","-","*","/","=","%","(",")","^","!","backspace","delete","enter","s","r"]
 

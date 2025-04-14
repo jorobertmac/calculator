@@ -17,6 +17,10 @@ const root = (a, b=2) => Math.pow(a, 1/b)
 
 const factorial = (a) => {  
   let b = 1
+  if (a < 0) {
+    a = -a
+    b = -b
+  }
   for (let i = 1; i <= a ; i++) {
     b *= i
   }

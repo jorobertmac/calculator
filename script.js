@@ -115,7 +115,8 @@ const buildCurrentNumber = (value) => {
 }
 
 const buildNextNumber = (value) => {
-  numbers.push(Number(currentNumber))
+  equation.push(currentNumber)
+  equation.push(value)
   currentNumber = ""
   inputToScreen()
 }
@@ -193,8 +194,8 @@ function currentNumberSignChange() {
 function deleteLast() {
   screen.textContent = screen.textContent.slice(0, -1)
   if (!currentNumber) {
-    currentNumber = String(numbers.at(-1))
-    numbers.splice(numbers.length - 1, 1)
+    currentNumber = String(equation.at(-1))
+    equation.splice(equation.length - 1, 1)
   }
   currentNumber = currentNumber.slice(0, -1)
 }
@@ -203,8 +204,7 @@ function clear() {
   if (confirm("Clear All?")) {
     screen.textContent = ""
     currentNumber = ""
-    numbers.splice(0, numbers.length)
-    equations.splice(0, equations.length)
+    equation.splice(0, equation.length)
   }
 }
 
@@ -262,16 +262,15 @@ function evaluateAddSub(equation) {
 }
 
 function equals() {
-  numbers.push(Number(currentNumber))
+  equation.push(Number(currentNumber))
   currentNumber = ""
-  screen.textContent = evaluate()
-
+  screen.textContent = evaluate(equation)
 }
 
 let currentNumber = ""
 let currentEquation = 0
-const numbers = []
-const equations = [["25","+","5","*","(","6","+","3",")","5","-","16","/","2"]]
+// const equation = ["25","+","5","*","(","6","+","3",")","5","-","16","/","2"]
+const equation = []
 const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r",] //MEM, M+, M
 const validOperators = ["+","-","*","/","=","%","(",")","^","!","backspace","delete","enter","s","r"]
 

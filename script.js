@@ -104,19 +104,20 @@ const keyClick = (keyPressed) => {
   } 
 }
 
-const inputToScreen = (value) => {
-  screen.textContent += value
+const inputToScreen = () => {
+  screen.textContent = equation.join("")
 }
 
 const buildCurrentNumber = (value) => {
+  inputToScreen()
   currentNumber += value
-  inputToScreen(value)
+  screen.textContent += currentNumber
 }
 
 const buildNextNumber = (value) => {
   numbers.push(Number(currentNumber))
   currentNumber = ""
-  inputToScreen(value)
+  inputToScreen()
 }
 
 const waitForOperator = () => {

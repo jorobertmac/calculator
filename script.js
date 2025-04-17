@@ -105,29 +105,44 @@ const keyClick = (keyPressed) => {
 }
 
 const inputToScreen = () => {
-  screen.textContent = equation.join("")
+  screen.textContent = equation.join("") + current
 }
 
 const buildCurrentNumber = (value) => {
+  current += value
   inputToScreen()
-  currentNumber += value
-  screen.textContent += currentNumber
 }
 
 const buildNextNumber = (value) => {
-  equation.push(currentNumber)
-  equation.push(value)
-  currentNumber = ""
-  inputToScreen()
+  if (value === "%" || value === "!") {
+    equation.push(current + value)
+    current = ""
+    inputToScreen()
+    return
+  }
+  if (current) {
+    equation.push(current)
+    current = ""
+  }
+  if (value.includes("^")) {
+    equation.push(value)
+    inputToScreen()
+    return
+  }
+  if (validateOperator()) {
+    equation.push(value)
+    current = ""
+    inputToScreen()
+  }
 }
 
 const waitForOperator = () => {
   buttons.forEach((button) => {
     if (!validOperators.includes(button.value)) {
       button.disabled = true
-    } else if (!["%","s","^","!"].includes(button.value)){
+    } else if (["+","-","*","/"].includes(button.value)){
       button.addEventListener("click", enableAllButtons)
-    }
+    } 
   })
 }
 
@@ -139,71 +154,83 @@ const enableAllButtons = () => {
 }
 
 function validateZero() {
-  if (currentNumber.length >= 1) {
+  if (current.length >= 1) {
     buildCurrentNumber("0")
   }
-  else if (!currentNumber) {
+  else if (!current) {
     buildCurrentNumber("0.")
   }
 }
 
 function validateDecimal() {
-  if (!currentNumber) {
+  if (!current) {
     buildCurrentNumber("0.")
   }
-  else if (!currentNumber.includes(".")) {
+  else if (!current.includes(".")) {
     buildCurrentNumber(".")
   }
 }
 
+function validateOperator () {
+  if ("+-*/".includes(equation.at(-1))) return false
+  if (
+    equation.at(-1). includes("!") ||
+    equation.at(-1).includes("%") ||
+    equation.at(-1).includes("^") ||
+    current.length > 0
+  ) {return true}
+}
+
 function currentNumberToPercent() {
-  const curNumLen = currentNumber.length
-  const curEquLen = screen.textContent.length
-  let curNumStr = currentNumber
-  currentNumber = String(percent(Number(curNumStr)))
-  screen.textContent = screen.textContent.slice(0, curEquLen - curNumLen) + currentNumber
+  buildNextNumber("%")
   waitForOperator()
 }
 
 function currentNumberToExponent() {
-  const curNumLen = currentNumber.length
-  const curEquLen = screen.textContent.length
-  let curNumStr = currentNumber
-  currentNumber = String(exponent(Number(curNumStr)))
-  screen.textContent = screen.textContent.slice(0, curEquLen - curNumLen) + currentNumber
-  waitForOperator()
+  if (equation.length === 0) {
+    buildNextNumber("^2")
+    waitForOperator()
+  } else  if (equation.at(-1).includes("^")){
+    let exponent = increaseExponent()
+    buildNextNumber(`^${exponent}`)
+    waitForOperator()
+    return
+  }
 }
+ function increaseExponent() {
+  let exponent = equation.pop().split("^")
+  exponent = Number(exponent[1])
+  return exponent += 1
+ }
 
 function currentNumberToFactorial() {
-  const curNumLen = currentNumber.length
-  const curEquLen = screen.textContent.length
-  let curNumStr = currentNumber
-  currentNumber = String(factorial(Number(curNumStr)))
-  screen.textContent = screen.textContent.slice(0, curEquLen - curNumLen) + currentNumber
+  buildNextNumber("!")
   waitForOperator()
 }
 
 function currentNumberSignChange() {
-  const curNumLen = currentNumber.length
+  const curNumLen = current.length
   const curEquLen = screen.textContent.length
-  let curNumStr = currentNumber
-  currentNumber = String(sign(Number(curNumStr)))
-  screen.textContent = screen.textContent.slice(0, curEquLen - curNumLen) + currentNumber
+  let curNumStr = current
+  current = String(sign(Number(curNumStr)))
+  screen.textContent = screen.textContent.slice(0, curEquLen - curNumLen) + current
 }
 
 function deleteLast() {
+  enableAllButtons()
   screen.textContent = screen.textContent.slice(0, -1)
-  if (!currentNumber) {
-    currentNumber = String(equation.at(-1))
+  if (!current) {
+    current = String(equation.at(-1))
     equation.splice(equation.length - 1, 1)
   }
-  currentNumber = currentNumber.slice(0, -1)
+  current = current.slice(0, -1)
 }
 
 function clear() {
+  enableAllButtons()
   if (confirm("Clear All?")) {
     screen.textContent = ""
-    currentNumber = ""
+    current = ""
     equation.splice(0, equation.length)
   }
 }
@@ -261,14 +288,20 @@ function evaluateAddSub(equation) {
   return equation = [...result]
 }
 
-function equals() {
-  equation.push(Number(currentNumber))
-  currentNumber = ""
-  screen.textContent = evaluate(equation)
+function evaluateFactorial(equation) {
+
 }
 
-let currentNumber = ""
-let currentEquation = 0
+function equals() {
+  equation.push(Number(current))
+  current = ""
+  answer = evaluate(equation)
+  screen.textContent = answer
+  equation.length = 0
+}
+
+let current = ""
+let answer
 // const equation = ["25","+","5","*","(","6","+","3",")","5","-","16","/","2"]
 const equation = []
 const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r",] //MEM, M+, M

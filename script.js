@@ -198,6 +198,9 @@ function currentNumberToExponent() {
     buildNextNumber(`^${exponent}`)
     waitForOperator()
     return
+  } else {
+    buildNextNumber("^2")
+    waitForOperator()
   }
 }
  function increaseExponent() {

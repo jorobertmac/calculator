@@ -172,11 +172,14 @@ function validateDecimal() {
 }
 
 function validateOperator () {
-  if ("+-*/".includes(equation.at(-1))) return false
+  if (equation.length === 0) return false
+  if ("+*/".includes(equation.at(-1))) return false
+  if (equation.at(-1) === "-") return false
   if (
-    equation.at(-1). includes("!") ||
+    equation.at(-1).includes("!") ||
     equation.at(-1).includes("%") ||
     equation.at(-1).includes("^") ||
+    equation.at(-1).includes("-") ||
     current.length > 0
   ) {return true}
 }
@@ -209,11 +212,9 @@ function currentNumberToFactorial() {
 }
 
 function currentNumberSignChange() {
-  const curNumLen = current.length
-  const curEquLen = screen.textContent.length
-  let curNumStr = current
-  current = String(sign(Number(curNumStr)))
-  screen.textContent = screen.textContent.slice(0, curEquLen - curNumLen) + current
+  if (!current || isNaN(current)) return
+  current = String(sign(Number(current)))
+  inputToScreen()
 }
 
 function deleteLast() {

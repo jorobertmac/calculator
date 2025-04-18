@@ -122,10 +122,10 @@ const buildNextNumber = (value) => {
   }
   if (current) {
     equation.push(current)
-    current = ""
   }
   if (value.includes("^")) {
     equation.push(value)
+    current = ""
     inputToScreen()
     return
   }
@@ -293,11 +293,14 @@ function evaluateFactorial(equation) {
 }
 
 function equals() {
-  equation.push(Number(current))
-  current = ""
+  if (current) {
+    equation.push(Number(current))
+    current = ""
+  }
   answer = evaluate(equation)
   screen.textContent = answer
   equation.length = 0
+  enableAllButtons()
 }
 
 let current = ""

@@ -241,6 +241,7 @@ function clear() {
 
 function evaluate(equation) {
   let newEquation = [...equation]
+  newEquation = evaluateFactorial(newEquation)
   newEquation = evaluateMulDiv(newEquation)
   newEquation = evaluateAddSub(newEquation)
   return newEquation
@@ -293,7 +294,17 @@ function evaluateAddSub(equation) {
 }
 
 function evaluateFactorial(equation) {
-
+  let result = []
+  for (let i = 0; i < equation.length; i++) {
+    if (equation[i].includes("!")) {
+      let number = equation[i].split("!")
+      result.push(factorial(Number(number[0])))
+    } else {
+      result.push(equation[i])
+    } 
+  }
+  equation.length = 0
+  return equation = [...result]
 }
 
 function equals() {

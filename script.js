@@ -114,6 +114,8 @@ const buildCurrentNumber = (value) => {
 }
 
 const buildNextNumber = (value) => {
+  if (current.length === 0 && equation.length === 0) return
+  
   if (value === "%" || value === "!") {
     equation.push(current)
     equation.push(value)
@@ -138,6 +140,7 @@ const buildNextNumber = (value) => {
 }
 
 const waitForOperator = () => {
+  if (equation.length === 0) return
   buttons.forEach((button) => {
     if (!validOperators.includes(button.value)) {
       button.disabled = true
@@ -184,9 +187,11 @@ function validateDecimal() {
 }
 
 function validateOperator () {
-  if (equation.length === 0) return false
-  if ("+*/".includes(equation.at(-1))) return false
-  if (equation.at(-1) === "-") return false
+  if (
+    equation.length === 0 ||
+    "+*/".includes(equation.at(-1)) ||
+    equation.at(-1) === "-"
+  ) {return false}
   if (
     equation.at(-1).includes("!") ||
     equation.at(-1).includes("%") ||
@@ -253,9 +258,9 @@ function clear() {
 
 function evaluate(equation) {
   let newEquation = [...equation]
-  newEquation = evaluateFactorial(newEquation)
+  newEquation = evaluateFactPercRootExp(newEquation)
   newEquation = evaluateMulDiv(newEquation)
-  if (newEquation === 0) return 0
+  if (newEquation === 0) return 0 //check for zero division error
   newEquation = evaluateAddSub(newEquation)
   return String(newEquation[0])
 }
@@ -272,7 +277,7 @@ function evaluateMulDiv(equation) {
       if (equation[i] === "*") {
         result.push(multiply(leftNumber, rightNumber))
       } else {
-        if (rightNumber === 0) return 0
+        if (rightNumber === 0) return 0 //check for zero division error
         result.push(divide(leftNumber, rightNumber))
       }
       i++
@@ -307,15 +312,21 @@ function evaluateAddSub(equation) {
   return equation = [...result]
 }
 
-function evaluateFactorial(equation) {
+function evaluateFactPercRootExp(equation) {
   let result = []
   for (let i = 0; i < equation.length; i++) {
-    if (equation[i].includes("!")) {
-      let number = equation[i].split("!")
-      result.push(factorial(Number(number[0])))
+    if (equation[i] === "!") {
+      result.push(factorial(Number(result.pop())))
+    } else if (equation[i] === "%") {
+      result.push(percent(Number(result.pop())))
+    } else if (equation[i] === "√") {
+      i++
+      result.push(root(Number(equation[i])))
+    } else if (equation[i].includes("^")) {
+      result.push(exponent(Number(result.pop()), Number(equation[i].slice(1))))
     } else {
       result.push(equation[i])
-    } 
+    }
   }
   equation.length = 0
   return equation = [...result]

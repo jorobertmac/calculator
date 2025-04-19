@@ -1,6 +1,15 @@
+@font-face {
+  font-family: lcd14;
+  src: url(lcd14.otf);
+}
 * {
   box-sizing: content-box;
 }
+
+#screen, #memory {
+  font-family: "lcd14";
+}
+
 button {
   width: 50px;
   height: 40px;

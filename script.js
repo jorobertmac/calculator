@@ -115,7 +115,8 @@ const buildCurrentNumber = (value) => {
 
 const buildNextNumber = (value) => {
   if (value === "%" || value === "!") {
-    equation.push(current + value)
+    equation.push(current)
+    equation.push(value)
     current = ""
     inputToScreen()
     return
@@ -160,6 +161,17 @@ function validateZero() {
   else if (!current) {
     buildCurrentNumber("0.")
   }
+}
+
+function zeroDivisionError() {
+  const chars = "@#$%^&*_+<>?"
+  return `ZERO - DIV - MAKE - BROKE -`.split("").map((char) => {
+    if (char === "-") {
+      return chars[Math.floor(Math.random() * chars.length)]
+    } else {
+      return char
+    }
+  }).join("")
 }
 
 function validateDecimal() {
@@ -243,8 +255,9 @@ function evaluate(equation) {
   let newEquation = [...equation]
   newEquation = evaluateFactorial(newEquation)
   newEquation = evaluateMulDiv(newEquation)
+  if (newEquation === 0) return 0
   newEquation = evaluateAddSub(newEquation)
-  return newEquation
+  return String(newEquation[0])
 }
 
 function evaluateMulDiv(equation) {
@@ -259,6 +272,7 @@ function evaluateMulDiv(equation) {
       if (equation[i] === "*") {
         result.push(multiply(leftNumber, rightNumber))
       } else {
+        if (rightNumber === 0) return 0
         result.push(divide(leftNumber, rightNumber))
       }
       i++
@@ -309,12 +323,33 @@ function evaluateFactorial(equation) {
 
 function equals() {
   if (current) {
-    equation.push(Number(current))
+    equation.push(current)
     current = ""
   }
-  answer = evaluate(equation)
-  screen.textContent = answer
+  if (equation.length === 0) return
+  current = evaluate(equation)
+  if (current === 0) {
+    equation.length = 0
+    current = ""
+    screen.textContent = zeroDivisionError()
+    let blink = 1
+    const interval = setInterval(() => {
+      if (current === "") {
+        if (blink % 12 === 0) {  
+          screen.textContent = ""
+          blink = 1
+        } else {
+          screen.textContent = zeroDivisionError()
+          blink++
+        }
+      } else {
+        clearInterval(interval)
+      }
+    }, 125)
+    return
+  }
   equation.length = 0
+  inputToScreen()
   enableAllButtons()
 }
 

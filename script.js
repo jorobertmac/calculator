@@ -51,13 +51,15 @@ const percent_button = document.querySelector("#percent")
 const sign_button = document.querySelector("#sign")
 const memoryCall_button = document.querySelector("#memoryCall")
 const memoryAdd_button = document.querySelector("#memoryAdd")
-const memoryCycle_button = document.querySelector("#memoryCycle")
+const memoryNext_button = document.querySelector("#memoryNext")
 const delete_button = document.querySelector("#delete")
 const clear_button = document.querySelector("#clear")
 const open_button = document.querySelector("#open")
 const close_button = document.querySelector("#close")
 const exponent_button = document.querySelector("#exponent")
+const xExponent_button = document.querySelector("#xExponent")
 const root_button = document.querySelector("#root")
+const xRoot_button = document.querySelector("#xRoot")
 const factorial_button = document.querySelector("#factorial")
 
 // ADDEVENTLISTENERS
@@ -81,13 +83,15 @@ percent_button.addEventListener("click", currentNumberToPercent)
 sign_button.addEventListener("click", currentNumberSignChange)
 // memoryCall_button.addEventListener("click", function)
 // memoryAdd_button.addEventListener("click", function)
-// memoryCycle_button.addEventListener("click", function)
+// memoryNext_button.addEventListener("click", function)
 delete_button.addEventListener("click", deleteLast)
 clear_button.addEventListener("click", clear)
 // open_button.addEventListener("click", function)
 // close_button.addEventListener("click", function)
 exponent_button.addEventListener("click", currentNumberToExponent)
-// root_button.addEventListener("click", function)
+root_button.addEventListener("click", currentNumberToRoot)
+// xExponent_button.addEventListener("click" function)
+// xRoot_button.addEventListener("click" function)
 factorial_button.addEventListener("click", currentNumberToFactorial)
 
 document.addEventListener("keydown", (event) => {keyClick(event)})
@@ -114,7 +118,15 @@ const buildCurrentNumber = (value) => {
 }
 
 const buildNextNumber = (value) => {
-  if (current.length === 0 && equation.length === 0) return
+  if (value.includes("√")) {  
+    equation.push(value)
+    current = ""
+    inputToScreen()
+    return
+  }
+  if (current.length === 0 && equation.length === 0) {
+    return
+  }
   
   if (value === "%" || value === "!") {
     equation.push(current)
@@ -190,7 +202,8 @@ function validateOperator () {
   if (
     equation.length === 0 ||
     "+*/".includes(equation.at(-1)) ||
-    equation.at(-1) === "-"
+    equation.at(-1) === "-" ||
+    current.length === 0
   ) {return false}
   if (
     equation.at(-1).includes("!") ||
@@ -206,13 +219,27 @@ function currentNumberToPercent() {
   waitForOperator()
 }
 
+function currentNumberToRoot() {
+  if (equation.length === 0) {
+    buildNextNumber("2√")
+  } else if (equation.at(-1).includes("√")) {
+    buildNextNumber(`${increaseRoot()}√`)
+  } else {
+    buildNextNumber("2√")
+  }
+}
+
+function increaseRoot() {
+  let root = Number(equation.pop().slice(0,-1))
+  return root += 1
+}
 function currentNumberToExponent() {
+  if (!current && !equation) return
   if (equation.length === 0) {
     buildNextNumber("^2")
     waitForOperator()
   } else  if (equation.at(-1).includes("^")){
-    let exponent = increaseExponent()
-    buildNextNumber(`^${exponent}`)
+    buildNextNumber(`^${increaseExponent()}`)
     waitForOperator()
     return
   } else {

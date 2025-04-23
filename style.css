@@ -7,7 +7,7 @@
 }
 
 #screen, #memory, #screenClear {
-  font-family: "VT323";
+  font-family: "VT323", monospace, monospace;
   font-size: 1.8rem;
 }
 #screenClear {

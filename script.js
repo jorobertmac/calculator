@@ -279,7 +279,7 @@ function deleteLast() {
 
 function clear() {
   screen.style.display = "none"
-  screenClear.style.display = "block"
+  screenClear.style.display = "flex"
   const buttonState = []
   buttons.forEach(button => {
     if (button.disabled) {

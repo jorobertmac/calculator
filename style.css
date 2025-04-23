@@ -1,14 +1,14 @@
 @font-face {
-  font-family: lcd14;
-  src: url(lcd14.otf);
+  font-family: VT323;
+  src: url(VT323-Regular.ttf);
 }
 * {
   box-sizing: content-box;
 }
 
 #screen, #memory, #screenClear {
-  font-family: monospace, monospace;
-  font-weight: 800;
+  font-family: "VT323";
+  font-size: 1.8rem;
 }
 #screenClear {
   display: none;

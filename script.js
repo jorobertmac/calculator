@@ -168,6 +168,10 @@ const waitForOperator = () => {
 
 const enableAllButtons = () => {
   buttons.forEach((button) => {
+    // Buttons currently have not been given functionality
+    // When enabled, remove html inline styling of "disabled" and remove from this array
+    if (["Msave", "Mnext", "Mcall", "^x", "x√",].includes(button.value)) return
+
     button.disabled = false
     button.removeEventListener("click", enableAllButtons)
   })

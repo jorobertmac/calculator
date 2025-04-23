@@ -29,6 +29,7 @@ const factorial = (a) => {
 
 // QUERYSELECTORS
 const screen = document.querySelector("#screen")
+const screenClear = document.querySelector("#screenClear")
 const memory = document.querySelector("#memory")
 const buttons = document.querySelectorAll("button")
 const number0_button = document.querySelector("#number0")
@@ -54,6 +55,8 @@ const memoryAdd_button = document.querySelector("#memoryAdd")
 const memoryNext_button = document.querySelector("#memoryNext")
 const delete_button = document.querySelector("#delete")
 const clear_button = document.querySelector("#clear")
+const clearY_button = document.querySelector("#clearY_button")
+const clearN_button = document.querySelector("#clearN_button")
 const open_button = document.querySelector("#open")
 const close_button = document.querySelector("#close")
 const exponent_button = document.querySelector("#exponent")
@@ -275,11 +278,48 @@ function deleteLast() {
 }
 
 function clear() {
-  enableAllButtons()
-  if (confirm("Clear All?")) {
+  screen.style.display = "none"
+  screenClear.style.display = "block"
+  const buttonState = []
+  buttons.forEach(button => {
+    if (button.disabled) {
+      buttonState.push(true)
+    } else {
+      buttonState.push(false)
+    }
+    if (button.classList.contains("clrButton")) {
+      button.disabled = false
+    } else {
+      button.disabled = true
+    }
+  })
+
+  clearY_button.addEventListener("click", clearY)
+  clearN_button.addEventListener("click", clearN)
+
+  function clearY() {
+    screen.style.display = "block"
+    screenClear.style.display = "none"
     screen.textContent = ""
     current = ""
-    equation.splice(0, equation.length)
+    equation.length = 0
+    enableAllButtons()
+    clearY_button.disabled = true
+    clearN_button.disabled = true
+    clearY_button.removeEventListener("click", clearY)
+    clearN_button.removeEventListener("click", clearN)
+  }
+  
+  function clearN() {
+    screen.style.display = "block"
+    screenClear.style.display = "none"
+    let i = 0
+    buttons.forEach(button => {
+      button.disabled = buttonState[i]
+      i++
+    })
+    clearY_button.removeEventListener("click", clearY)
+    clearN_button.removeEventListener("click", clearN)
   }
 }
 
@@ -395,6 +435,6 @@ let current = ""
 let answer
 // const equation = ["25","+","5","*","(","6","+","3",")","5","-","16","/","2"]
 const equation = []
-const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r",] //MEM, M+, M
-const validOperators = ["+","-","*","/","=","%","(",")","^","!","backspace","delete","enter","s","r"]
+const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r", "y", "n",] //MEM, M+, M
+const validOperators = ["+","-","*","/","=","%","(",")","^","!","backspace","delete","enter","s","r",]
 

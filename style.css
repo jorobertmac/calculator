@@ -6,8 +6,18 @@
   box-sizing: content-box;
 }
 
-#screen, #memory {
-  font-family: "lcd14";
+#screen, #memory, #screenClear {
+  font-family: monospace, monospace;
+  font-weight: 800;
+}
+#screenClear {
+  display: none;
+}
+
+.clrButton {
+  width: 35px;
+  height: 20px;
+  border-radius: 15%;
 }
 
 button {

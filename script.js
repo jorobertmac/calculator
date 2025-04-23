@@ -387,9 +387,9 @@ function evaluateFactPercRootExp(equation) {
       result.push(factorial(Number(result.pop())))
     } else if (equation[i] === "%") {
       result.push(percent(Number(result.pop())))
-    } else if (equation[i] === "√") {
+    } else if (equation[i].includes("√")) {
       i++
-      result.push(root(Number(equation[i])))
+      result.push(root(Number(equation[i]), Number(equation[i-1].slice(0,-1))))
     } else if (equation[i].includes("^")) {
       result.push(exponent(Number(result.pop()), Number(equation[i].slice(1))))
     } else {

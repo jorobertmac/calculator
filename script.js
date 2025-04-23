@@ -5,15 +5,15 @@ const subtract = (a, b) =>  a - b
 
 const multiply = (a, b) =>  a * b
 
-const divide = (a, b) =>  a / b
+const divide = (a, b) =>  Number((a / b).toFixed(3))
 
-const percent = (a) => a/100
+const percent = (a) => Number((a/100).toFixed(3))
 
 const sign = (a) => -a
 
-const exponent = (a, b=2) => Math.pow(a, b)
+const exponent = (a, b=2) => Number(Math.pow(a, b).toFixed(3))
 
-const root = (a, b=2) => Math.pow(a, 1/b)
+const root = (a, b=2) => Number(Math.pow(a, 1/b).toFixed(3))
 
 const factorial = (a) => {  
   let b = 1
@@ -106,6 +106,7 @@ const keyClick = (keyPressed) => {
     buttons.forEach((button) => {
       if (key === button.value) {
         button.click()
+        button.blur()
       }
     })
   } 

@@ -177,6 +177,14 @@ const enableAllButtons = () => {
   })
 }
 
+function openParentheses() {
+
+}
+
+function closeParentheses() {
+
+}
+
 function validateZero() {
   if (current.length >= 1) {
     buildCurrentNumber("0")

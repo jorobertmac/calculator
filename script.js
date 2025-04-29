@@ -399,7 +399,7 @@ const VALUES = {
   percent: {},
   exponent: {},
   xExponent: {},
-  root: {value: null, html: "<sup>2</sup>√", type: "modifier"},
+  root: {value: null, html: "<sub><sup><sup>2</sup></sup></sub>√", type: "modifier"},
   xRoot: {},
   factorial: {},
   open: {},

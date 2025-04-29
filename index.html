@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Make Numbers Be Different</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div id="calculator">
+      <div id="memory" style="height: 16px; border: 1px solid black;margin: 5px;"></div>
+      <div id="screen" style="height: 32px; border: 1px solid black;margin: 5px;"></div>
+      <div id="screenClear" style="height: 32px; border: 1px solid black;margin: 5px;">
+        CLEAR: <button id="clearY_button" value="y" class="clrButton" disabled>Y</button> <button id="clearN_button" value="n" class="clrButton" disabled>N</button>
+      </div>
+      <div>
+        <button id="memoryAdd" value="Msave" class="operator" disabled >M(save)</button>
+        <button id="memoryNext" value="Mnext" class="operator" disabled >M(next)</button>
+        <button id="memoryCall" value="Mcall" class="operator" disabled >M(call)</button>
+        <button id="clear" value="delete" class="operator" >CLR</button>
+        <button id="delete" value="backspace" class="operator" >DEL</button>
+      </div>
+      <div>
+        <button id="root" value="r" class="operator" >√</button>
+        <button id="open" value="(" class="operator" >(</button>
+        <button id="close" value=")" class="operator" >)</button>
+        <button id="percent" value="%" class="operator" >%</button>
+        <button id="sign" value="s" class="operator" >+/-</button>
+      </div>
+      <div>
+        <button id="xRoot" value="x√" class="operator" disabled >x√</button>
+        <button id="number7" value="7" class="number" >7</button>
+        <button id="number8" value="8" class="number" >8</button>
+        <button id="number9" value="9" class="number" >9</button>
+        <button id="add" value="+" class="operator" >+</button>
+      </div>
+      <div>
+        <button id="exponent" value="^" class="operator" >^</button>
+        <button id="number4" value="4" class="number" >4</button>
+        <button id="number5" value="5" class="number" >5</button>
+        <button id="number6" value="6" class="number" >6</button>
+        <button id="subtract" value="-" class="operator" >-</button>
+      </div>
+      <div>
+        <button id="xExponent" value="^x" class="operator" disabled >^x</button>
+        <button id="number1" value="1" class="number" >1</button>
+        <button id="number2" value="2" class="number" >2</button>
+        <button id="number3" value="3" class="number" >3</button>
+        <button id="multiply" value="*" class="operator" >*</button>
+      </div>
+      <div>
+        <button id="factorial" value="!" class="operator" >!</button>
+        <button id="decimal" value="." class="operator" >.</button>
+        <button id="number0" value="0" class="number" >0</button>        
+        <button id="equals" value="enter" class="operator" >=</button>
+        <button id="divide" value="/" class="operator" >/</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

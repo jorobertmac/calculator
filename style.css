@@ -1,0 +1,30 @@
+@font-face {
+  font-family: VT323;
+  src: url(VT323-Regular.ttf);
+}
+* {
+  box-sizing: content-box;
+}
+
+#screen, #memory, #screenClear {
+  font-family: "VT323", monospace, monospace;
+  font-size: 1.8rem;
+}
+#screenClear {
+  display: none;
+}
+
+.clrButton {
+  width: 35px;
+  height: 20px;
+  border-radius: 15%;
+}
+
+button {
+  width: 50px;
+  height: 40px;
+  border-radius: 10%;
+  margin: 3px;
+  font-size: 10px;
+  padding: 0;
+}

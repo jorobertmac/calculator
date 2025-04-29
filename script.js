@@ -64,36 +64,36 @@ const xRoot_button = document.querySelector("#xRoot")
 const factorial_button = document.querySelector("#factorial")
 
 // ADDEVENTLISTENERS
-number0_button.addEventListener("click", pushToEquation)
-number1_button.addEventListener("click", pushToEquation)
-number2_button.addEventListener("click", pushToEquation)
-number3_button.addEventListener("click", pushToEquation)
-number4_button.addEventListener("click", pushToEquation)
-number5_button.addEventListener("click", pushToEquation)
-number6_button.addEventListener("click", pushToEquation)
-number7_button.addEventListener("click", pushToEquation)
-number8_button.addEventListener("click", pushToEquation)
-number9_button.addEventListener("click", pushToEquation)
-add_button.addEventListener("click", pushToEquation)
-subtract_button.addEventListener("click", pushToEquation)
-multiply_button.addEventListener("click", pushToEquation)
-divide_button.addEventListener("click", pushToEquation)
-decimal_button.addEventListener("click", pushToEquation)
-equals_button.addEventListener("click", pushToEquation)
-percent_button.addEventListener("click", pushToEquation)
-sign_button.addEventListener("click", pushToEquation)
-// memoryCall_button.addEventListener("click", pushToEquation)
-// memoryAdd_button.addEventListener("click", pushToEquation)
-// memoryNext_button.addEventListener("click", pushToEquation)
-delete_button.addEventListener("click", pushToEquation)
-clear_button.addEventListener("click", pushToEquation)
-// open_button.addEventListener("click", pushToEquation)
-// close_button.addEventListener("click", pushToEquation)
-exponent_button.addEventListener("click", pushToEquation)
-root_button.addEventListener("click", pushToEquation)
-// xExponent_button.addEventListener("click", pushToEquation)
-// xRoot_button.addEventListener("click", pushToEquation)
-factorial_button.addEventListener("click", pushToEquation)
+number0_button.addEventListener("click", pushToCurrent)
+number1_button.addEventListener("click", pushToCurrent)
+number2_button.addEventListener("click", pushToCurrent)
+number3_button.addEventListener("click", pushToCurrent)
+number4_button.addEventListener("click", pushToCurrent)
+number5_button.addEventListener("click", pushToCurrent)
+number6_button.addEventListener("click", pushToCurrent)
+number7_button.addEventListener("click", pushToCurrent)
+number8_button.addEventListener("click", pushToCurrent)
+number9_button.addEventListener("click", pushToCurrent)
+add_button.addEventListener("click", pushToCurrent)
+subtract_button.addEventListener("click", pushToCurrent)
+multiply_button.addEventListener("click", pushToCurrent)
+divide_button.addEventListener("click", pushToCurrent)
+decimal_button.addEventListener("click", pushToCurrent)
+equals_button.addEventListener("click", pushToCurrent)
+percent_button.addEventListener("click", pushToCurrent)
+sign_button.addEventListener("click", pushToCurrent)
+// memoryCall_button.addEventListener("click", pushToCurrent)
+// memoryAdd_button.addEventListener("click", pushToCurrent)
+// memoryNext_button.addEventListener("click", pushToCurrent)
+delete_button.addEventListener("click", pushToCurrent)
+clear_button.addEventListener("click", pushToCurrent)
+// open_button.addEventListener("click", pushToCurrent)
+// close_button.addEventListener("click", pushToCurrent)
+exponent_button.addEventListener("click", pushToCurrent)
+root_button.addEventListener("click", pushToCurrent)
+// xExponent_button.addEventListener("click", pushToCurrent)
+// xRoot_button.addEventListener("click", pushToCurrent)
+factorial_button.addEventListener("click", pushToCurrent)
 
 document.addEventListener("keydown", (event) => {keyClick(event)})
 
@@ -110,14 +110,18 @@ const keyClick = (keyPressed) => {
   } 
 }
 
-function inputToScreen(value) {
-  screen.innerHTML = equation
+function inputToScreen() {
+  let eString = equation.map(obj => obj.html).join("")
+  let cString = current.map(obj => obj.html).join("")
+  screen.innerHTML = eString + cString
 }
 
-function pushToEquation() {
-  equation += this.value
+function pushToCurrent() {
+  current.push(VALUES[this.id])
+  console.log(current)
   inputToScreen()
 }
+
 
 
 function zeroDivisionError() {
@@ -130,6 +134,28 @@ function zeroDivisionError() {
     }
   }).join("")
 }
+
+// // ZERO DIVISION ERROR INTERVAL
+// if (current === 0) {
+//   equation.length = 0
+//   current = ""
+//   screen.textContent = zeroDivisionError()
+//   let blink = 1
+//   const interval = setInterval(() => {
+//     if (current === "") {
+//       if (blink % 12 === 0) {  
+//         screen.textContent = ""
+//         blink = 1
+//       } else {
+//         screen.textContent = zeroDivisionError()
+//         blink++
+//       }
+//     } else {
+//       clearInterval(interval)
+//     }
+//   }, 125)
+//   return
+// }
 
 function validateDecimal() {
   if (!current) {
@@ -346,10 +372,43 @@ function equals() {
   enableAllButtons()
 }
 
-let current = ""
+let current = []
 let answer = 0
 // const equation = ["25","+","5","*","(","6","+","3",")","5","-","16","/","2"]
-let equation = ""
+let equation = []
 const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r", "y", "n",] //MEM, M+, M
 const validOperators = ["+","-","*","/","=","%","(",")","^","!","backspace","delete","enter","s","r",]
+
+const VALUES = {
+  number0: {value: 0, html: "0", type: "number",},
+  number1: {value: 1, html: "1", type: "number",},
+  number2: {value: 2, html: "2", type: "number",},
+  number3: {value: 3, html: "3", type: "number",},
+  number4: {value: 4, html: "4", type: "number",},
+  number5: {value: 5, html: "5", type: "number",},
+  number6: {value: 6, html: "6", type: "number",},
+  number7: {value: 7, html: "7", type: "number",},
+  number8: {value: 8, html: "8", type: "number",},
+  number9: {value: 9, html: "9", type: "number",},
+  decimal: {},
+  add: {},
+  subtract: {},
+  multiply: {},
+  divide: {},
+  sign: {},
+  percent: {},
+  exponent: {},
+  xExponent: {},
+  root: {value: null, html: "<sup>2</sup>√", type: "modifier"},
+  xRoot: {},
+  factorial: {},
+  open: {},
+  close: {},
+  memoryAdd: {},
+  memoryNext: {},
+  memoryCall: {},
+  clear: {},
+  delete: {},
+  equals: {},
+}
 

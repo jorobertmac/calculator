@@ -87,8 +87,8 @@ sign_button.addEventListener("click", pushToCurrent)
 // memoryNext_button.addEventListener("click", pushToCurrent)
 delete_button.addEventListener("click", pushToCurrent)
 clear_button.addEventListener("click", pushToCurrent)
-// open_button.addEventListener("click", pushToCurrent)
-// close_button.addEventListener("click", pushToCurrent)
+open_button.addEventListener("click", pushToCurrent)
+close_button.addEventListener("click", pushToCurrent)
 exponent_button.addEventListener("click", pushToCurrent)
 root_button.addEventListener("click", pushToCurrent)
 // xExponent_button.addEventListener("click", pushToCurrent)
@@ -111,14 +111,12 @@ const keyClick = (keyPressed) => {
 }
 
 function inputToScreen() {
-  let eString = equation.map(obj => obj.html).join("")
-  let cString = current.map(obj => obj.html).join("")
-  screen.innerHTML = eString + cString
+  screen.innerHTML = current
 }
 
 function pushToCurrent() {
-  current.push(VALUES[this.id])
-  console.log(current)
+  current += VALUES[this.id].html
+  equation += VALUES[this.id].value
   inputToScreen()
 }
 
@@ -372,43 +370,67 @@ function equals() {
   enableAllButtons()
 }
 
-let current = []
-let answer = 0
-// const equation = ["25","+","5","*","(","6","+","3",")","5","-","16","/","2"]
-let equation = []
-const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r", "y", "n",] //MEM, M+, M
-const validOperators = ["+","-","*","/","=","%","(",")","^","!","backspace","delete","enter","s","r",]
 
 const VALUES = {
-  number0: {value: 0, html: "0", type: "number",},
-  number1: {value: 1, html: "1", type: "number",},
-  number2: {value: 2, html: "2", type: "number",},
-  number3: {value: 3, html: "3", type: "number",},
-  number4: {value: 4, html: "4", type: "number",},
-  number5: {value: 5, html: "5", type: "number",},
-  number6: {value: 6, html: "6", type: "number",},
-  number7: {value: 7, html: "7", type: "number",},
-  number8: {value: 8, html: "8", type: "number",},
-  number9: {value: 9, html: "9", type: "number",},
-  decimal: {},
-  add: {},
-  subtract: {},
-  multiply: {},
-  divide: {},
-  sign: {},
-  percent: {},
-  exponent: {},
-  xExponent: {},
-  root: {value: null, html: "<sub><sup><sup>2</sup></sup></sub>√", type: "modifier"},
-  xRoot: {},
-  factorial: {},
-  open: {},
-  close: {},
+  number0: {value: "0", html: "0", type: "number",},
+  number1: {value: "1", html: "1", type: "number",},
+  number2: {value: "2", html: "2", type: "number",},
+  number3: {value: "3", html: "3", type: "number",},
+  number4: {value: "4", html: "4", type: "number",},
+  number5: {value: "5", html: "5", type: "number",},
+  number6: {value: "6", html: "6", type: "number",},
+  number7: {value: "7", html: "7", type: "number",},
+  number8: {value: "8", html: "8", type: "number",},
+  number9: {value: "9", html: "9", type: "number",},
+
+  decimal: {value: ".", html: ".", type: "decimal"},
+  
+  add: {value: "+", html: "+", type: "operator"},
+  subtract: {value: "-", html: "-", type: "operator"},
+  multiply: {value: "*", html: "*", type: "operator"},
+  divide: {value: "/", html: "/", type: "operator"},
+  
+  sign: {value: "s", html: "<sub><sup>-</sup></sub>", type: "sign"},
+  
+  percent: {value: "%", html: "%", type: "percent"},
+  exponent: {value: "e", html: "<sub><sup><sup>2</sup></sup></sub>", type: "exponent"},
+  xExponent: {value: "p", html: "<sub><sup><sup>2</sup></sup></sub>", type: "exponent"},
+  root: {value: "r", html: "<sub><sup><sup>2</sup></sup></sub>√", type: "root"},
+  xRoot: {value: "n", html: "<sub><sup><sup>2</sup></sup></sub>√", type: "root"},
+  factorial: {value: "f", html: "!", type: "factorial"},
+  
+  open: {value: "(", html: "("},
+  close: {value: ")", html: ")"},
+  
   memoryAdd: {},
   memoryNext: {},
   memoryCall: {},
+  
   clear: {},
   delete: {},
   equals: {},
 }
 
+const STATES = {
+  open: ["number", "decimal", "root", "open", ],
+  number: ["number", "decimal", "operator", "sign", "percent", "exponent", "factorial", "close", ],
+  operator: ["number", "decimal", "root", "open", ],
+  percent: ["operator", "sign", "percent", "exponent", "factorial", "close", ],
+  exponent: [],
+  root: [],
+  factorial: [],
+  close: [],
+  parenthese: 0,
+  superscript: false,
+  decimal: true,
+  equals: false,
+}
+
+
+let current = ""
+let equation = ""
+let state = STATES["open"]
+let answer = 0
+// const equation = ["25","+","5","*","(","6","+","3",")","5","-","16","/","2"]
+const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r", "y", "n",] //MEM, M+, M
+const validOperators = ["+","-","*","/","=","%","(",")","^","!","backspace","delete","enter","s","r",]

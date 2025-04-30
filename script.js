@@ -85,7 +85,7 @@ sign_button.addEventListener("click", pushToCurrent)
 // memoryCall_button.addEventListener("click", pushToCurrent)
 // memoryAdd_button.addEventListener("click", pushToCurrent)
 // memoryNext_button.addEventListener("click", pushToCurrent)
-delete_button.addEventListener("click", pushToCurrent)
+delete_button.addEventListener("click", deleteLast)
 clear_button.addEventListener("click", pushToCurrent)
 open_button.addEventListener("click", pushToCurrent)
 close_button.addEventListener("click", pushToCurrent)
@@ -111,7 +111,7 @@ const keyClick = (keyPressed) => {
 }
 
 function inputToScreen() {
-  screen.innerHTML = current
+  screen.innerHTML = current || "0"
 }
 
 function pushToCurrent() {
@@ -208,12 +208,9 @@ function currentNumberSignChange() {
 }
 
 function deleteLast() {
-  screen.textContent = screen.textContent.slice(0, -1)
-  if (!current) {
-    current = String(equation.at(-1))
-    equation.splice(equation.length - 1, 1)
-  }
+  equation = equation.slice(0, -1)
   current = current.slice(0, -1)
+  inputToScreen()
 }
 
 function clear() {
@@ -399,8 +396,8 @@ const VALUES = {
   xRoot: {value: "n", html: "<sub><sup><sup>2</sup></sup></sub>√", type: "root"},
   factorial: {value: "f", html: "!", type: "factorial"},
   
-  open: {value: "(", html: "("},
-  close: {value: ")", html: ")"},
+  open: {value: "(", html: "(", type: "open"},
+  close: {value: ")", html: ")", type: "close"},
   
   memoryAdd: {},
   memoryNext: {},
@@ -416,10 +413,10 @@ const STATES = {
   number: ["number", "decimal", "operator", "sign", "percent", "exponent", "factorial", "close", ],
   operator: ["number", "decimal", "root", "open", ],
   percent: ["operator", "sign", "percent", "exponent", "factorial", "close", ],
-  exponent: [],
-  root: [],
-  factorial: [],
-  close: [],
+  exponent: ["operator", "sign", "percent", "exponent", "factorial", "close", ],
+  root: ["number", "decimal", "open", "root", ],
+  factorial: ["operator", "sign", "percent", "exponent", "factorial", "close", ],
+  close: ["operator", "percent", "exponent", "factorial", "close", ],
   parenthese: 0,
   superscript: false,
   decimal: true,
@@ -434,3 +431,4 @@ let answer = 0
 // const equation = ["25","+","5","*","(","6","+","3",")","5","-","16","/","2"]
 const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r", "y", "n",] //MEM, M+, M
 const validOperators = ["+","-","*","/","=","%","(",")","^","!","backspace","delete","enter","s","r",]
+inputToScreen()

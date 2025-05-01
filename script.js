@@ -64,36 +64,36 @@ const xRoot_button = document.querySelector("#xRoot")
 const factorial_button = document.querySelector("#factorial")
 
 // ADDEVENTLISTENERS
-number0_button.addEventListener("click", pushToCurrent)
-number1_button.addEventListener("click", pushToCurrent)
-number2_button.addEventListener("click", pushToCurrent)
-number3_button.addEventListener("click", pushToCurrent)
-number4_button.addEventListener("click", pushToCurrent)
-number5_button.addEventListener("click", pushToCurrent)
-number6_button.addEventListener("click", pushToCurrent)
-number7_button.addEventListener("click", pushToCurrent)
-number8_button.addEventListener("click", pushToCurrent)
-number9_button.addEventListener("click", pushToCurrent)
-add_button.addEventListener("click", pushToCurrent)
-subtract_button.addEventListener("click", pushToCurrent)
-multiply_button.addEventListener("click", pushToCurrent)
-divide_button.addEventListener("click", pushToCurrent)
-decimal_button.addEventListener("click", pushToCurrent)
-equals_button.addEventListener("click", pushToCurrent)
-percent_button.addEventListener("click", pushToCurrent)
-sign_button.addEventListener("click", pushToCurrent)
-// memoryCall_button.addEventListener("click", pushToCurrent)
-// memoryAdd_button.addEventListener("click", pushToCurrent)
-// memoryNext_button.addEventListener("click", pushToCurrent)
+number0_button.addEventListener("click", pushToEquation)
+number1_button.addEventListener("click", pushToEquation)
+number2_button.addEventListener("click", pushToEquation)
+number3_button.addEventListener("click", pushToEquation)
+number4_button.addEventListener("click", pushToEquation)
+number5_button.addEventListener("click", pushToEquation)
+number6_button.addEventListener("click", pushToEquation)
+number7_button.addEventListener("click", pushToEquation)
+number8_button.addEventListener("click", pushToEquation)
+number9_button.addEventListener("click", pushToEquation)
+add_button.addEventListener("click", pushToEquation)
+subtract_button.addEventListener("click", pushToEquation)
+multiply_button.addEventListener("click", pushToEquation)
+divide_button.addEventListener("click", pushToEquation)
+decimal_button.addEventListener("click", pushToEquation)
+equals_button.addEventListener("click", pushToEquation)
+percent_button.addEventListener("click", pushToEquation)
+sign_button.addEventListener("click", pushToEquation)
+// memoryCall_button.addEventListener("click", pushToEquation)
+// memoryAdd_button.addEventListener("click", pushToEquation)
+// memoryNext_button.addEventListener("click", pushToEquation)
 delete_button.addEventListener("click", deleteLast)
-clear_button.addEventListener("click", pushToCurrent)
-open_button.addEventListener("click", pushToCurrent)
-close_button.addEventListener("click", pushToCurrent)
-exponent_button.addEventListener("click", pushToCurrent)
-root_button.addEventListener("click", pushToCurrent)
-// xExponent_button.addEventListener("click", pushToCurrent)
-// xRoot_button.addEventListener("click", pushToCurrent)
-factorial_button.addEventListener("click", pushToCurrent)
+clear_button.addEventListener("click", pushToEquation)
+open_button.addEventListener("click", pushToEquation)
+close_button.addEventListener("click", pushToEquation)
+exponent_button.addEventListener("click", pushToEquation)
+root_button.addEventListener("click", pushToEquation)
+// xExponent_button.addEventListener("click", pushToEquation)
+// xRoot_button.addEventListener("click", pushToEquation)
+factorial_button.addEventListener("click", pushToEquation)
 
 document.addEventListener("keydown", (event) => {keyClick(event)})
 
@@ -114,15 +114,47 @@ function inputToScreen() {
   screen.innerHTML = current || "0"
 }
 
-function pushToCurrent() {
-  current += VALUES[this.id].html
-  equation += VALUES[this.id].value
+function pushToEquation() {
+  const button = VALUES[this.id]
+  if (button.type === "equals") equals()
+  if (!state.includes(button.type)) return
+
+  if (button.type === "operator" && state === STATES.operator) {
+    equation.pop()
+  }
+
+  state = STATES[button.type]
+
+  if (button.type === "operator") decimalAvailable = true
+
+  if (button.type === "open") parenthese += 1
+  if (button.type === "close" && parenthese === 0) return
+  if (button.type === "close" && parenthese > 0) parenthese -= 1
+
+
+  // if (["root", "exponent", ].includes(button.type)) superscript = true
+
+  if (button.type === "decimal" && !decimalAvailable) return
+  if (button.type === "decimal") decimalAvailable = false
+
+
+  
+  equation.push({button: button, currentState: {state, parenthese, superscript, decimalAvailable, equate, }})
+  current = screenHTML()
   inputToScreen()
+}
+
+function screenHTML() {
+  return equation.map(char => {
+    if (char.currentState.superscript) return `<sub><sup><sup>${char.button.html}</sup></sup></sub>`
+    return char.button.html
+  }).join("")
 }
 
 
 
-function zeroDivisionError() {
+
+function zeroDivisionErrorText() {
   const chars = "@#$%^&*_+<>?"
   return `ZERO - DIV - MAKE - BROKE -`.split("").map((char) => {
     if (char === "-") {
@@ -133,11 +165,26 @@ function zeroDivisionError() {
   }).join("")
 }
 
+function zeroDivisionErrorInterval() {
+  screen.innerHTML = zeroDivisionErrorText()
+  let blink = 1
+  const interval = setInterval(() => {
+    if (blink % 12 === 0) {
+      screen.innerHTML = ""
+      blink = 1
+    } else {
+      screen.innerHTML = zeroDivisionErrorText()
+      blink++
+    }
+    if (pressAnyKey) clearInterval(interval)
+  }, 125);
+}
+
 // // ZERO DIVISION ERROR INTERVAL
 // if (current === 0) {
 //   equation.length = 0
 //   current = ""
-//   screen.textContent = zeroDivisionError()
+//   screen.textContent = zeroDivisionErrorText()
 //   let blink = 1
 //   const interval = setInterval(() => {
 //     if (current === "") {
@@ -145,7 +192,7 @@ function zeroDivisionError() {
 //         screen.textContent = ""
 //         blink = 1
 //       } else {
-//         screen.textContent = zeroDivisionError()
+//         screen.textContent = zeroDivisionErrorText()
 //         blink++
 //       }
 //     } else {
@@ -208,8 +255,10 @@ function currentNumberSignChange() {
 }
 
 function deleteLast() {
-  equation = equation.slice(0, -1)
-  current = current.slice(0, -1)
+  const last = equation.pop()
+  console.log(last);
+  
+  current = screenHTML()
   inputToScreen()
 }
 
@@ -336,35 +385,50 @@ function evaluateFactPercRootExp(equation) {
 }
 
 function equals() {
-  if (current) {
-    equation.push(current)
-    current = ""
+  if (!equation.length) return
+  let result = []
+  let build = false
+  let num = ""
+  for (let article of equation) {
+    if (["number", "decimal", "sign", ].includes(article.button.type)) {
+      build = true
+      num += article.button.value
+    } else {
+      if (num) {result.push(num)}
+      num = ""
+      build = false
+      result.push(article.button.value)
+    }
   }
-  if (equation.length === 0) return
-  current = evaluate(equation)
-  if (current === 0) {
-    equation.length = 0
-    current = ""
-    screen.textContent = zeroDivisionError()
-    let blink = 1
-    const interval = setInterval(() => {
-      if (current === "") {
-        if (blink % 12 === 0) {  
-          screen.textContent = ""
-          blink = 1
-        } else {
-          screen.textContent = zeroDivisionError()
-          blink++
-        }
-      } else {
-        clearInterval(interval)
-      }
-    }, 125)
-    return
-  }
-  equation.length = 0
-  inputToScreen()
-  enableAllButtons()
+  console.log(result)
+  
+  
+
+
+  // current = evaluate(equation)
+  // if (current === 0) {
+  //   equation.length = 0
+  //   current = ""
+  //   screen.textContent = zeroDivisionErrorText()
+  //   let blink = 1
+  //   const interval = setInterval(() => {
+  //     if (current === "") {
+  //       if (blink % 12 === 0) {  
+  //         screen.textContent = ""
+  //         blink = 1
+  //       } else {
+  //         screen.textContent = zeroDivisionErrorText()
+  //         blink++
+  //       }
+  //     } else {
+  //       clearInterval(interval)
+  //     }
+  //   }, 125)
+  //   return
+  // }
+  // equation.length = 0
+  // inputToScreen()
+  // enableAllButtons()
 }
 
 
@@ -405,28 +469,30 @@ const VALUES = {
   
   clear: {},
   delete: {},
-  equals: {},
+  equals: {type: "equals"},
 }
 
 const STATES = {
   open: ["number", "decimal", "root", "open", ],
   number: ["number", "decimal", "operator", "sign", "percent", "exponent", "factorial", "close", ],
-  operator: ["number", "decimal", "root", "open", ],
+  decimal: ["number", ],
+  operator: ["number", "decimal", "root", "open", "operator", ],
   percent: ["operator", "sign", "percent", "exponent", "factorial", "close", ],
   exponent: ["operator", "sign", "percent", "exponent", "factorial", "close", ],
   root: ["number", "decimal", "open", "root", ],
   factorial: ["operator", "sign", "percent", "exponent", "factorial", "close", ],
   close: ["operator", "percent", "exponent", "factorial", "close", ],
-  parenthese: 0,
-  superscript: false,
-  decimal: true,
-  equals: false,
 }
 
 
+let state = STATES.open
+let parenthese = 0
+let superscript = false
+let decimalAvailable = true
+let equate = false
+
 let current = ""
-let equation = ""
-let state = STATES["open"]
+let equation = []
 let answer = 0
 // const equation = ["25","+","5","*","(","6","+","3",")","5","-","16","/","2"]
 const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r", "y", "n",] //MEM, M+, M

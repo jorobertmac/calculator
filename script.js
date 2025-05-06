@@ -71,7 +71,7 @@ subtract_button.addEventListener("click", pushToEquation)
 multiply_button.addEventListener("click", pushToEquation)
 divide_button.addEventListener("click", pushToEquation)
 decimal_button.addEventListener("click", pushToEquation)
-equals_button.addEventListener("click", pushToEquation)
+equals_button.addEventListener("click", equals)
 percent_button.addEventListener("click", pushToEquation)
 sign_button.addEventListener("click", changeSign)
 delete_button.addEventListener("click", deleteLast)
@@ -104,11 +104,12 @@ function pushToEquation() {
   pressAnyKey = false
   this.blur()
   const button = VALUES[this.id]
-  if (button.type === "equals") {
-    equals()
-    return
-  }
   if (!state.includes(button.type)) return
+
+  if (state === STATES.equals && button.type === "sign") {
+    state = STATES.sign
+    equation = []
+  }
 
   if (button.type === "operator" && state === STATES.operator) {
     equation.pop()
@@ -118,21 +119,17 @@ function pushToEquation() {
 
   if (button.type === "operator") decimalAvailable = true
 
-  if (button.type === "open") parenthese += 1
-  if (button.type === "close" && parenthese === 0) return
-  if (button.type === "close" && parenthese > 0) parenthese -= 1
 
   if (button.type === "decimal" && !decimalAvailable) return
   if (button.type === "decimal") decimalAvailable = false
   
-  equation.push({button: button, currentState: {state, parenthese, decimalAvailable, }})
+  equation.push({button: button, currentState: {state, decimalAvailable, }})
   current = screenHTML()
   inputToScreen()
 }
 
 function screenHTML() {
   return equation.map(char => {
-    if (char.currentState.superscript) return `<sub><sup><sup>${char.button.html}</sup></sup></sub>`
     return char.button.html
   }).join("")
 }
@@ -141,8 +138,7 @@ function changeSign() {
   let result = []
   for (let i = equation.length - 1; i >= -1; i--) {
     if (i === -1) {
-      result.unshift({button: VALUES.sign, currentState: {state, parenthese, decimalAvailable, }})
-      equation.length = 0
+      result.unshift({button: VALUES.sign, currentState: {state, decimalAvailable, }})
       equation = [...result]
       current = screenHTML()
       inputToScreen()
@@ -152,15 +148,13 @@ function changeSign() {
       result.unshift(equation[i])
     } else if (equation[i].button.type === "sign") {
       result.unshift(...equation.slice(0, i))
-      equation.length = 0
       equation = [...result]
       current = screenHTML()
       inputToScreen()
       return
     } else {
-      result.unshift({button: VALUES.sign, currentState: {state, parenthese, decimalAvailable, }})
+      result.unshift({button: VALUES.sign, currentState: {state, decimalAvailable, }})
       result.unshift(...equation.slice(0, i+1))
-      equation.length = 0
       equation = [...result]
       current = screenHTML()
       inputToScreen()
@@ -232,7 +226,7 @@ function clear() {
     screenClear.style.display = "none"
     screen.textContent = ""
     current = ""
-    equation.length = 0
+    equation = []
     enableAllButtons()
     clearY_button.disabled = true
     clearN_button.disabled = true
@@ -284,7 +278,6 @@ function evaluateFactPercRootExp(equation) {
         break
     }
   }
-  equation.length = 0
   return equation = [...result]
 }
 
@@ -309,7 +302,6 @@ function evaluateMulDiv(equation) {
         result.push(equation[i])
     }
   }
-  equation.length = 0
   return equation = [...result]
 }
 
@@ -333,12 +325,12 @@ function evaluateAddSub(equation) {
         result.push(equation[i])
     }
   }
-  equation.length = 0
   return equation = [...result]
 }
 
 function equals() {
   if (!equation.length) return
+  if (state === STATES.operator) {equation.pop()}
   let result = []
   let num = ""
 
@@ -357,15 +349,20 @@ function equals() {
   if (num) result.push(Number(num))
 
   result = evaluate(result)
+  console.log(result);
+  
+  
   
   current = ""
-  equation.length = 0
+  equation = []
   
   if (result === "ERROR Divide by 0") {
     zeroDivisionErrorInterval()
   } else {
-    for (number of result) {   
+    for (number of result) {
       buttonIds[number].click()
+      console.log([...equation]);
+      
     }
     inputToScreen()
   }
@@ -414,7 +411,7 @@ const STATES = {
   root: ["number", "decimal", "open", "root", ],
   factorial: ["operator", "sign", "percent", "exponent", "factorial", "close", ],
   close: ["operator", "percent", "exponent", "factorial", "close", ],
-  sign: [],
+  sign: ["number"],
   equals: ["operator", "sign", "percent", "exponent", "factorial", "number", ]
 }
 
@@ -435,7 +432,6 @@ const buttonIds = {
 
 
 let state = STATES.open
-let parenthese = 0
 let decimalAvailable = true
 let pressAnyKey = false
 

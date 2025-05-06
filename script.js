@@ -81,7 +81,7 @@ divide_button.addEventListener("click", pushToEquation)
 decimal_button.addEventListener("click", pushToEquation)
 equals_button.addEventListener("click", pushToEquation)
 percent_button.addEventListener("click", pushToEquation)
-sign_button.addEventListener("click", pushToEquation)
+sign_button.addEventListener("click", changeSign)
 // memoryCall_button.addEventListener("click", pushToEquation)
 // memoryAdd_button.addEventListener("click", pushToEquation)
 // memoryNext_button.addEventListener("click", pushToEquation)
@@ -125,11 +125,6 @@ function pushToEquation() {
   }
   if (!state.includes(button.type)) return
 
-  if (button.type === "sign") {
-    changeSign()
-    return
-  }
-
   if (button.type === "operator" && state === STATES.operator) {
     equation.pop()
   }
@@ -141,8 +136,6 @@ function pushToEquation() {
   if (button.type === "open") parenthese += 1
   if (button.type === "close" && parenthese === 0) return
   if (button.type === "close" && parenthese > 0) parenthese -= 1
-
-  // if (["root", "exponent", ].includes(button.type)) superscript = true
 
   if (button.type === "decimal" && !decimalAvailable) return
   if (button.type === "decimal") decimalAvailable = false
@@ -351,15 +344,9 @@ function evaluateFactPercRootExp(equation) {
         i++
         result.push(root(equation[i]))
         break
-      // case "t":
-        // result.push(root(equation[++i], equation[++i]))
-      //   break
       case "e":
         result.push(exponent(result.pop()))
         break
-      // case "p":
-        // result.push(exponent(result.pop(), equation[++i]))
-      //   break
       default:
         result.push(equation[i])
         break

@@ -119,8 +119,16 @@ function pushToEquation() {
   pressAnyKey = false
   this.blur()
   const button = VALUES[this.id]
-  if (button.type === "equals") equals()
+  if (button.type === "equals") {
+    equals()
+    return
+  }
   if (!state.includes(button.type)) return
+
+  if (button.type === "sign") {
+    changeSign()
+    return
+  }
 
   if (button.type === "operator" && state === STATES.operator) {
     equation.pop()
@@ -151,6 +159,37 @@ function screenHTML() {
   }).join("")
 }
 
+function changeSign() {
+  let result = []
+  for (let i = equation.length - 1; i >= -1; i--) {
+    if (i === -1) {
+      result.unshift({button: VALUES.sign, currentState: {state, parenthese, superscript, decimalAvailable, equate, }})
+      equation.length = 0
+      equation = [...result]
+      current = screenHTML()
+      inputToScreen()
+      return
+    }
+    if (["number", "decimal", "percent", "exponent", ].includes(equation[i].button.type)) {
+      result.unshift(equation[i])
+    } else if (equation[i].button.type === "sign") {
+      result.unshift(...equation.slice(0, i))
+      equation.length = 0
+      equation = [...result]
+      current = screenHTML()
+      inputToScreen()
+      return
+    } else {
+      result.unshift({button: VALUES.sign, currentState: {state, parenthese, superscript, decimalAvailable, equate, }})
+      result.unshift(...equation.slice(0, i+1))
+      equation.length = 0
+      equation = [...result]
+      current = screenHTML()
+      inputToScreen()
+      return
+    }
+  }
+}
 
 
 
@@ -238,9 +277,7 @@ function currentNumberSignChange() {
 }
 
 function deleteLast() {
-  const last = equation.pop()
-  console.log(last);
-  
+  equation.pop()
   current = screenHTML()
   inputToScreen()
 }
@@ -385,25 +422,23 @@ function equals() {
   if (!equation.length) return
   history.push([...equation])
   let result = []
-  let build = false
   let num = ""
 
   // Parse numbers and operators
   for (let article of equation) {
-    if (["number", "decimal", "sign", ].includes(article.button.type)) {
-      build = true
+    if (["number", "decimal", ].includes(article.button.type)) {
       num += article.button.value
+    } else if (article.button.type === "sign") {
+      num += "-"
     } else {
       if (num) {result.push(Number(num))}
       num = ""
-      build = false
       result.push(article.button.value)
     }
   }
   if (num) result.push(Number(num))
 
   result = evaluate(result)
-  console.log(result);
   
   current = ""
   equation.length = 0
@@ -411,12 +446,12 @@ function equals() {
   if (result === "ERROR Divide by 0") {
     zeroDivisionErrorInterval()
   } else {
-    for (number of result) {
-      console.log(buttonIds[number])      
+    for (number of result) {   
       buttonIds[number].click()
     }
     inputToScreen()
   }
+  state = STATES.equals
 }
 
 
@@ -470,7 +505,8 @@ const STATES = {
   root: ["number", "decimal", "open", "root", ],
   factorial: ["operator", "sign", "percent", "exponent", "factorial", "close", ],
   close: ["operator", "percent", "exponent", "factorial", "close", ],
-  sign: []
+  sign: [],
+  equals: ["operator", "sign", "percent", "exponent", "factorial", ]
 }
 
 const buttonIds = {
@@ -503,3 +539,5 @@ let history = []
 const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r", "y", "n",] //MEM, M+, M
 const validOperators = ["+","-","*","/","=","%","(",")","^","!","backspace","delete","enter","s","r",]
 inputToScreen()
+
+testeq = ["25","+","5","*","5","-","16","/","s","2",".","3"]

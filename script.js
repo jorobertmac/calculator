@@ -106,8 +106,11 @@ function pushToEquation() {
   const button = VALUES[this.id]
   if (!state.includes(button.type)) return
 
-  if (state === STATES.equals && button.type === "sign") {
-    state = STATES.sign
+  if (state === STATES.equals && button.type === "root") {
+    state = STATES.root
+    equation = []
+  }
+  if (state === STATES.equals && button.type === "number") {
     equation = []
   }
 
@@ -196,7 +199,16 @@ function zeroDivisionErrorInterval() {
 }
 
 function deleteLast() {
-  equation.pop()
+  if (state === STATES.equals) {
+    state = equation[equation.length - 1].button.type
+  }
+  if (equation.pop().button.type === "decimal") decimalAvailable = true
+  if (equation.length) {
+    let last = equation.pop()
+    buttonIds[last.button.value].click()
+  } else {
+    state = STATES.open
+  }
   current = screenHTML()
   inputToScreen()
 }
@@ -331,6 +343,7 @@ function evaluateAddSub(equation) {
 function equals() {
   if (!equation.length) return
   if (state === STATES.operator) {equation.pop()}
+  decimalAvailable = true
   let result = []
   let num = ""
 
@@ -349,20 +362,17 @@ function equals() {
   if (num) result.push(Number(num))
 
   result = evaluate(result)
-  console.log(result);
-  
-  
   
   current = ""
   equation = []
+  state = STATES.equals
   
   if (result === "ERROR Divide by 0") {
     zeroDivisionErrorInterval()
   } else {
     for (number of result) {
-      buttonIds[number].click()
-      console.log([...equation]);
-      
+      if (number === "-") state = STATES.sign
+      buttonIds[number].click()      
     }
     inputToScreen()
   }
@@ -402,17 +412,16 @@ const VALUES = {
 }
 
 const STATES = {
-  open: ["number", "decimal", "root", "open", ],
-  number: ["number", "decimal", "operator", "sign", "percent", "exponent", "factorial", "close", ],
+  open: ["number", "decimal", "root", ],
+  number: ["number", "decimal", "operator", "sign", "percent", "exponent", "factorial", ],
   decimal: ["number", ],
-  operator: ["number", "decimal", "root", "open", "operator", ],
-  percent: ["operator", "sign", "percent", "exponent", "factorial", "close", ],
-  exponent: ["operator", "sign", "percent", "exponent", "factorial", "close", ],
-  root: ["number", "decimal", "open", "root", ],
-  factorial: ["operator", "sign", "percent", "exponent", "factorial", "close", ],
-  close: ["operator", "percent", "exponent", "factorial", "close", ],
+  operator: ["number", "decimal", "root", "operator", ],
+  percent: ["operator", "sign", "percent", "exponent", "factorial", ],
+  exponent: ["operator", "sign", "percent", "exponent", "factorial", ],
+  root: ["number", "decimal", "root", ],
+  factorial: ["operator", "sign", "percent", "exponent", "factorial", ],
   sign: ["number"],
-  equals: ["operator", "sign", "percent", "exponent", "factorial", "number", ]
+  equals: ["number", "operator", "sign", "percent", "exponent", "root", "factorial",  ]
 }
 
 const buttonIds = {
@@ -437,5 +446,5 @@ let pressAnyKey = false
 
 let current = ""
 let equation = []
-const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r", "y", "n",] //MEM, M+, M
+const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","^","!","backspace","delete","enter","s","r", "y", "n",]
 inputToScreen()

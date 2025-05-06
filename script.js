@@ -91,14 +91,15 @@ open_button.addEventListener("click", pushToEquation)
 close_button.addEventListener("click", pushToEquation)
 exponent_button.addEventListener("click", pushToEquation)
 root_button.addEventListener("click", pushToEquation)
-// xExponent_button.addEventListener("click", pushToEquation)
-// xRoot_button.addEventListener("click", pushToEquation)
+xExponent_button.addEventListener("click", pushToEquation)
+xRoot_button.addEventListener("click", pushToEquation)
 factorial_button.addEventListener("click", pushToEquation)
 
 document.addEventListener("keydown", (event) => {keyClick(event)})
 
 // FUNCTIONS
 const keyClick = (keyPressed) => {
+  pressAnyKey = false
   const key = keyPressed.key.toLowerCase()
   if (validKeys.includes(key)) {
     buttons.forEach((button) => {
@@ -115,6 +116,8 @@ function inputToScreen() {
 }
 
 function pushToEquation() {
+  pressAnyKey = false
+  this.blur()
   const button = VALUES[this.id]
   if (button.type === "equals") equals()
   if (!state.includes(button.type)) return
@@ -131,13 +134,10 @@ function pushToEquation() {
   if (button.type === "close" && parenthese === 0) return
   if (button.type === "close" && parenthese > 0) parenthese -= 1
 
-
   // if (["root", "exponent", ].includes(button.type)) superscript = true
 
   if (button.type === "decimal" && !decimalAvailable) return
   if (button.type === "decimal") decimalAvailable = false
-
-
   
   equation.push({button: button, currentState: {state, parenthese, superscript, decimalAvailable, equate, }})
   current = screenHTML()
@@ -166,6 +166,7 @@ function zeroDivisionErrorText() {
 }
 
 function zeroDivisionErrorInterval() {
+  pressAnyKey = true
   screen.innerHTML = zeroDivisionErrorText()
   let blink = 1
   const interval = setInterval(() => {
@@ -176,31 +177,13 @@ function zeroDivisionErrorInterval() {
       screen.innerHTML = zeroDivisionErrorText()
       blink++
     }
-    if (pressAnyKey) clearInterval(interval)
-  }, 125);
+    if (!pressAnyKey) {
+      clearInterval(interval)
+      inputToScreen()
+    }
+  }, 125)
 }
 
-// // ZERO DIVISION ERROR INTERVAL
-// if (current === 0) {
-//   equation.length = 0
-//   current = ""
-//   screen.textContent = zeroDivisionErrorText()
-//   let blink = 1
-//   const interval = setInterval(() => {
-//     if (current === "") {
-//       if (blink % 12 === 0) {  
-//         screen.textContent = ""
-//         blink = 1
-//       } else {
-//         screen.textContent = zeroDivisionErrorText()
-//         blink++
-//       }
-//     } else {
-//       clearInterval(interval)
-//     }
-//   }, 125)
-//   return
-// }
 
 function validateDecimal() {
   if (!current) {
@@ -312,29 +295,62 @@ function evaluate(equation) {
   let newEquation = [...equation]
   newEquation = evaluateFactPercRootExp(newEquation)
   newEquation = evaluateMulDiv(newEquation)
-  if (newEquation === 0) return 0 //check for zero division error
+  if (newEquation === "ERROR Divide by 0") return "ERROR Divide by 0"
   newEquation = evaluateAddSub(newEquation)
-  return String(newEquation[0])
+  return String(newEquation).split("")
+}
+
+function evaluateFactPercRootExp(equation) {
+  let result = []
+  for (let i= 0; i < equation.length; i++) {
+    switch (equation[i]) {
+      case "f":
+        result.push(factorial(result.pop()))
+        break
+      case "%":
+        result.push(percent(result.pop()))
+        break
+      case "r":
+        i++
+        result.push(root(equation[i]))
+        break
+      // case "t":
+        // result.push(root(equation[++i], equation[++i]))
+      //   break
+      case "e":
+        result.push(exponent(result.pop()))
+        break
+      // case "p":
+        // result.push(exponent(result.pop(), equation[++i]))
+      //   break
+      default:
+        result.push(equation[i])
+        break
+    }
+  }
+  equation.length = 0
+  return equation = [...result]
 }
 
 function evaluateMulDiv(equation) {
   let result = []
-  for (let i = 0; i < equation.length; i++) {
-    if (equation[i] === "*" || equation[i] === "/") {
-      const leftNumber = Number(result[result.length - 1])
-      const rightNumber = Number(equation[i + 1])
-
-      result.pop()
-
-      if (equation[i] === "*") {
+  for (let i= 0; i < equation.length; i++) {
+    switch (equation[i]) {
+      case "*": {
+        const leftNumber = Number(result.pop()) // removes last number from result
+        const rightNumber = Number(equation[++i]) // skips to next number in equation
         result.push(multiply(leftNumber, rightNumber))
-      } else {
-        if (rightNumber === 0) return 0 //check for zero division error
-        result.push(divide(leftNumber, rightNumber))
+        break
       }
-      i++
-    } else {
-      result.push(equation[i])
+      case "/": {
+        const leftNumber = Number(result.pop()) // removes last number from result
+        const rightNumber = Number(equation[++i]) // skips to next number in equation
+        if (rightNumber === 0) return "ERROR Divide by 0"
+        result.push(divide(leftNumber, rightNumber))
+        break
+      }
+      default:
+        result.push(equation[i])
     }
   }
   equation.length = 0
@@ -343,41 +359,22 @@ function evaluateMulDiv(equation) {
 
 function evaluateAddSub(equation) {
   let result = []
-  for (let i = 0; i < equation.length; i++) {
-    if (equation[i] === "+" || equation[i] === "-") {
-      const leftNumber = Number(result[result.length - 1])
-      const rightNumber = Number(equation[i + 1])
-
-      result.pop()
-
-      if (equation[i] === "+") {
+  for (let i= 0; i < equation.length; i++) {
+    switch (equation[i]) {
+      case "+": {
+        const leftNumber = Number(result.pop()) // removes last number from result
+        const rightNumber = Number(equation[++i]) // skips to next number in equation
         result.push(add(leftNumber, rightNumber))
-      } else {
-        result.push(subtract(leftNumber, rightNumber))
+        break
       }
-      i++
-    } else {
-      result.push(equation[i])
-    }
-  }
-  equation.length = 0
-  return equation = [...result]
-}
-
-function evaluateFactPercRootExp(equation) {
-  let result = []
-  for (let i = 0; i < equation.length; i++) {
-    if (equation[i] === "!") {
-      result.push(factorial(Number(result.pop())))
-    } else if (equation[i] === "%") {
-      result.push(percent(Number(result.pop())))
-    } else if (equation[i].includes("√")) {
-      i++
-      result.push(root(Number(equation[i]), Number(equation[i-1].slice(0,-1))))
-    } else if (equation[i].includes("^")) {
-      result.push(exponent(Number(result.pop()), Number(equation[i].slice(1))))
-    } else {
-      result.push(equation[i])
+      case "-": {
+        const leftNumber = Number(result.pop()) // removes last number from result
+        const rightNumber = Number(equation[++i]) // skips to next number in equation
+        result.push(subtract(leftNumber, rightNumber))
+        break
+      }
+      default:
+        result.push(equation[i])
     }
   }
   equation.length = 0
@@ -386,49 +383,40 @@ function evaluateFactPercRootExp(equation) {
 
 function equals() {
   if (!equation.length) return
+  history.push([...equation])
   let result = []
   let build = false
   let num = ""
+
+  // Parse numbers and operators
   for (let article of equation) {
     if (["number", "decimal", "sign", ].includes(article.button.type)) {
       build = true
       num += article.button.value
     } else {
-      if (num) {result.push(num)}
+      if (num) {result.push(Number(num))}
       num = ""
       build = false
       result.push(article.button.value)
     }
   }
-  console.log(result)
-  
-  
+  if (num) result.push(Number(num))
 
-
-  // current = evaluate(equation)
-  // if (current === 0) {
-  //   equation.length = 0
-  //   current = ""
-  //   screen.textContent = zeroDivisionErrorText()
-  //   let blink = 1
-  //   const interval = setInterval(() => {
-  //     if (current === "") {
-  //       if (blink % 12 === 0) {  
-  //         screen.textContent = ""
-  //         blink = 1
-  //       } else {
-  //         screen.textContent = zeroDivisionErrorText()
-  //         blink++
-  //       }
-  //     } else {
-  //       clearInterval(interval)
-  //     }
-  //   }, 125)
-  //   return
-  // }
-  // equation.length = 0
-  // inputToScreen()
-  // enableAllButtons()
+  result = evaluate(result)
+  console.log(result);
+  
+  current = ""
+  equation.length = 0
+  
+  if (result === "ERROR Divide by 0") {
+    zeroDivisionErrorInterval()
+  } else {
+    for (number of result) {
+      console.log(buttonIds[number])      
+      buttonIds[number].click()
+    }
+    inputToScreen()
+  }
 }
 
 
@@ -457,7 +445,7 @@ const VALUES = {
   exponent: {value: "e", html: "<sub><sup><sup>2</sup></sup></sub>", type: "exponent"},
   xExponent: {value: "p", html: "<sub><sup><sup>2</sup></sup></sub>", type: "exponent"},
   root: {value: "r", html: "<sub><sup><sup>2</sup></sup></sub>√", type: "root"},
-  xRoot: {value: "n", html: "<sub><sup><sup>2</sup></sup></sub>√", type: "root"},
+  xRoot: {value: "t", html: "<sub><sup><sup>2</sup></sup></sub>√", type: "root"},
   factorial: {value: "f", html: "!", type: "factorial"},
   
   open: {value: "(", html: "(", type: "open"},
@@ -482,6 +470,22 @@ const STATES = {
   root: ["number", "decimal", "open", "root", ],
   factorial: ["operator", "sign", "percent", "exponent", "factorial", "close", ],
   close: ["operator", "percent", "exponent", "factorial", "close", ],
+  sign: []
+}
+
+const buttonIds = {
+  "0": number0_button,
+  "1": number1_button,
+  "2": number2_button,
+  "3": number3_button,
+  "4": number4_button,
+  "5": number5_button,
+  "6": number6_button,
+  "7": number7_button,
+  "8": number8_button,
+  "9": number9_button,
+  ".": decimal_button,
+  "-": sign_button,
 }
 
 
@@ -490,10 +494,11 @@ let parenthese = 0
 let superscript = false
 let decimalAvailable = true
 let equate = false
+let pressAnyKey = false
 
 let current = ""
 let equation = []
-let answer = 0
+let history = []
 // const equation = ["25","+","5","*","(","6","+","3",")","5","-","16","/","2"]
 const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r", "y", "n",] //MEM, M+, M
 const validOperators = ["+","-","*","/","=","%","(",")","^","!","backspace","delete","enter","s","r",]

@@ -75,7 +75,7 @@ equals_button.addEventListener("click", equals)
 percent_button.addEventListener("click", pushToEquation)
 sign_button.addEventListener("click", changeSign)
 delete_button.addEventListener("click", deleteLast)
-clear_button.addEventListener("click", pushToEquation)
+clear_button.addEventListener("click", clear)
 exponent_button.addEventListener("click", pushToEquation)
 root_button.addEventListener("click", pushToEquation)
 factorial_button.addEventListener("click", pushToEquation)
@@ -86,6 +86,10 @@ document.addEventListener("keydown", (event) => {keyClick(event)})
 const keyClick = (keyPressed) => {
   pressAnyKey = false
   const key = keyPressed.key.toLowerCase()
+  if (clearing && key === "delete") {
+    clearY_button.click()
+    return
+  } 
   if (validKeys.includes(key)) {
     buttons.forEach((button) => {
       if (key === button.value) {
@@ -216,13 +220,8 @@ function deleteLast() {
 function clear() {
   screen.style.display = "none"
   screenClear.style.display = "flex"
-  const buttonState = []
+  clearing = true
   buttons.forEach(button => {
-    if (button.disabled) {
-      buttonState.push(true)
-    } else {
-      buttonState.push(false)
-    }
     if (button.classList.contains("clrButton")) {
       button.disabled = false
     } else {
@@ -236,23 +235,34 @@ function clear() {
   function clearY() {
     screen.style.display = "block"
     screenClear.style.display = "none"
-    screen.textContent = ""
+    buttons.forEach(button => {
+      if (button.classList.contains("clrButton")) {
+        button.disabled = true
+      } else {
+        button.disabled = false
+      }
+    })
     current = ""
     equation = []
-    enableAllButtons()
+    state = STATES.open
+    decimalAvailable = true
+    clearing = false
     clearY_button.disabled = true
     clearN_button.disabled = true
     clearY_button.removeEventListener("click", clearY)
     clearN_button.removeEventListener("click", clearN)
+    inputToScreen()
   }
   
   function clearN() {
     screen.style.display = "block"
     screenClear.style.display = "none"
-    let i = 0
     buttons.forEach(button => {
-      button.disabled = buttonState[i]
-      i++
+      if (button.classList.contains("clrButton")) {
+        button.disabled = true
+      } else {
+        button.disabled = false
+      }
     })
     clearY_button.removeEventListener("click", clearY)
     clearN_button.removeEventListener("click", clearN)
@@ -443,6 +453,7 @@ const buttonIds = {
 let state = STATES.open
 let decimalAvailable = true
 let pressAnyKey = false
+let clearing = false
 
 let current = ""
 let equation = []

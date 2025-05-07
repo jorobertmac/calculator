@@ -3,7 +3,7 @@
   src: url(VT323-Regular.ttf);
 }
 * {
-  box-sizing: content-box;
+  box-sizing: border;
 }
 
 .container {
@@ -38,6 +38,10 @@ div {
   display: none;
 }
 
+#equals {
+  width: 109px;
+}
+
 .clrButton {
   width: 35px;
   height: 20px;
@@ -51,6 +55,7 @@ button {
   border-radius: 5px;
   background-color: #dddddd;
   transition: background-color .3s ease;
+  transition: border .1s;
   margin: 3px;
   font-size: 10px;
   padding: 0;
@@ -63,6 +68,11 @@ button:disabled {
 
 button:hover {
   background-color: #f8e4cb;
-  border: 2px solid #555555;
+  border: 3px solid #555555;
+}
+
+button:active, .active {
+  background-color: #555555;
+  border: 5px solid #dddddd;
 }
 

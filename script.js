@@ -93,6 +93,15 @@ const keyClick = (keyPressed) => {
   if (validKeys.includes(key)) {
     buttons.forEach((button) => {
       if (key === button.value) {
+        button.classList.toggle("active")
+        let time = 1
+        const interval = setInterval(() => {
+          time++
+          if (time > 3) {
+            button.classList.toggle("active")
+            clearInterval(interval)
+          }
+        }, 50);
         button.click()
         button.blur()
       }

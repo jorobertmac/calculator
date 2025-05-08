@@ -5,32 +5,29 @@ const subtract = (a, b) =>  a - b
 
 const multiply = (a, b) =>  a * b
 
-const divide = (a, b) =>  Number((a / b).toFixed(3))
+const divide = (a, b) =>  a / b
 
-const percent = (a) => Number((a/100).toFixed(3))
+const percent = (a) => a/100
 
 const sign = (a) => -a
 
-const exponent = (a, b=2) => Number(Math.pow(a, b).toFixed(3))
+const exponent = (a, b=2) => a ** b
 
-const root = (a, b=2) => Number(Math.pow(a, 1/b).toFixed(3))
+const root = (a, b=2) => a ** (1/b)
 
-const factorial = (a) => {  
+const factorial = (a) => {
+  if (a < 0) return "ERROR - Negative Factorial"
+  if (a % 1 !== 0) return "ERROR - Non-Integer"
   let b = 1
-  if (a < 0) {
-    a = -a
-    b = -b
-  }
   for (let i = 1; i <= a ; i++) {
     b *= i
   }
-  return Number(b.toPrecision(3))
+  return b
 }
 
 // QUERYSELECTORS
 const screen = document.querySelector("#screen")
 const screenClear = document.querySelector("#screenClear")
-const memory = document.querySelector("#memory")
 const buttons = document.querySelectorAll("button")
 const number0_button = document.querySelector("#number0")
 const number1_button = document.querySelector("#number1")
@@ -50,61 +47,61 @@ const decimal_button = document.querySelector("#decimal")
 const equals_button = document.querySelector("#equals")
 const percent_button = document.querySelector("#percent")
 const sign_button = document.querySelector("#sign")
-const memoryCall_button = document.querySelector("#memoryCall")
-const memoryAdd_button = document.querySelector("#memoryAdd")
-const memoryNext_button = document.querySelector("#memoryNext")
 const delete_button = document.querySelector("#delete")
 const clear_button = document.querySelector("#clear")
 const clearY_button = document.querySelector("#clearY_button")
 const clearN_button = document.querySelector("#clearN_button")
-const open_button = document.querySelector("#open")
-const close_button = document.querySelector("#close")
 const exponent_button = document.querySelector("#exponent")
-const xExponent_button = document.querySelector("#xExponent")
 const root_button = document.querySelector("#root")
-const xRoot_button = document.querySelector("#xRoot")
 const factorial_button = document.querySelector("#factorial")
 
 // ADDEVENTLISTENERS
-number0_button.addEventListener("click", validateZero)
-number1_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
-number2_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
-number3_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
-number4_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
-number5_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
-number6_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
-number7_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
-number8_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
-number9_button.addEventListener("click", (event) => {buildCurrentNumber(event.target.textContent)})
-add_button.addEventListener("click", (event) => {buildNextNumber(event.target.textContent)})
-subtract_button.addEventListener("click", (event) => {buildNextNumber(event.target.textContent)})
-multiply_button.addEventListener("click", (event) => {buildNextNumber(event.target.textContent)})
-divide_button.addEventListener("click", (event) => {buildNextNumber(event.target.textContent)})
-decimal_button.addEventListener("click", validateDecimal)
+number0_button.addEventListener("click", pushToEquation)
+number1_button.addEventListener("click", pushToEquation)
+number2_button.addEventListener("click", pushToEquation)
+number3_button.addEventListener("click", pushToEquation)
+number4_button.addEventListener("click", pushToEquation)
+number5_button.addEventListener("click", pushToEquation)
+number6_button.addEventListener("click", pushToEquation)
+number7_button.addEventListener("click", pushToEquation)
+number8_button.addEventListener("click", pushToEquation)
+number9_button.addEventListener("click", pushToEquation)
+add_button.addEventListener("click", pushToEquation)
+subtract_button.addEventListener("click", pushToEquation)
+multiply_button.addEventListener("click", pushToEquation)
+divide_button.addEventListener("click", pushToEquation)
+decimal_button.addEventListener("click", pushToEquation)
 equals_button.addEventListener("click", equals)
-percent_button.addEventListener("click", currentNumberToPercent)
-sign_button.addEventListener("click", currentNumberSignChange)
-// memoryCall_button.addEventListener("click", function)
-// memoryAdd_button.addEventListener("click", function)
-// memoryNext_button.addEventListener("click", function)
+percent_button.addEventListener("click", pushToEquation)
+sign_button.addEventListener("click", changeSign)
 delete_button.addEventListener("click", deleteLast)
 clear_button.addEventListener("click", clear)
-// open_button.addEventListener("click", function)
-// close_button.addEventListener("click", function)
-exponent_button.addEventListener("click", currentNumberToExponent)
-root_button.addEventListener("click", currentNumberToRoot)
-// xExponent_button.addEventListener("click" function)
-// xRoot_button.addEventListener("click" function)
-factorial_button.addEventListener("click", currentNumberToFactorial)
+exponent_button.addEventListener("click", pushToEquation)
+root_button.addEventListener("click", pushToEquation)
+factorial_button.addEventListener("click", pushToEquation)
 
 document.addEventListener("keydown", (event) => {keyClick(event)})
 
 // FUNCTIONS
 const keyClick = (keyPressed) => {
+  pressAnyKey = false
   const key = keyPressed.key.toLowerCase()
+  if (clearing && key === "delete") {
+    clearY_button.click()
+    return
+  } 
   if (validKeys.includes(key)) {
     buttons.forEach((button) => {
       if (key === button.value) {
+        button.classList.toggle("active")
+        let time = 1
+        const interval = setInterval(() => {
+          time++
+          if (time > 3) {
+            button.classList.toggle("active")
+            clearInterval(interval)
+          }
+        }, 50);
         button.click()
         button.blur()
       }
@@ -112,89 +109,79 @@ const keyClick = (keyPressed) => {
   } 
 }
 
-const inputToScreen = () => {
-  screen.textContent = equation.join("") + current
+function inputToScreen() {
+  screen.innerHTML = current || "0"
 }
 
-const buildCurrentNumber = (value) => {
-  current += value
+function pushToEquation() {
+  pressAnyKey = false
+  this.blur()
+  const button = VALUES[this.id]
+  if (!state.includes(button.type)) return
+
+  if (state === STATES.equals && button.type === "root") {
+    state = STATES.root
+    equation = []
+  }
+  if (state === STATES.equals && button.type === "number") {
+    equation = []
+  }
+
+  if (button.type === "operator" && state === STATES.operator) {
+    equation.pop()
+  }
+
+  state = STATES[button.type]
+
+  if (button.type === "operator") decimalAvailable = true
+
+
+  if (button.type === "decimal" && !decimalAvailable) return
+  if (button.type === "decimal") decimalAvailable = false
+  
+  equation.push({button: button, currentState: {state, decimalAvailable, }})
+  current = screenHTML()
   inputToScreen()
 }
 
-const buildNextNumber = (value) => {
-  if (value.includes("√")) {  
-    equation.push(value)
-    current = ""
-    inputToScreen()
-    return
-  }
-  if (current.length === 0 && equation.length === 0) {
-    return
-  }
-  
-  if (value === "%" || value === "!") {
-    equation.push(current)
-    equation.push(value)
-    current = ""
-    inputToScreen()
-    return
-  }
-  if (current) {
-    equation.push(current)
-  }
-  if (value.includes("^")) {
-    equation.push(value)
-    current = ""
-    inputToScreen()
-    return
-  }
-  if (validateOperator()) {
-    equation.push(value)
-    current = ""
-    inputToScreen()
+function screenHTML() {
+  return equation.map(char => {
+    return char.button.html
+  }).join("")
+}
+
+function changeSign() {
+  let result = []
+  for (let i = equation.length - 1; i >= -1; i--) {
+    if (i === -1) {
+      result.unshift({button: VALUES.sign, currentState: {state, decimalAvailable, }})
+      equation = [...result]
+      current = screenHTML()
+      inputToScreen()
+      return
+    }
+    if (["number", "decimal", "percent", "exponent", ].includes(equation[i].button.type)) {
+      result.unshift(equation[i])
+    } else if (equation[i].button.type === "sign") {
+      result.unshift(...equation.slice(0, i))
+      equation = [...result]
+      current = screenHTML()
+      inputToScreen()
+      return
+    } else {
+      result.unshift({button: VALUES.sign, currentState: {state, decimalAvailable, }})
+      result.unshift(...equation.slice(0, i+1))
+      equation = [...result]
+      current = screenHTML()
+      inputToScreen()
+      return
+    }
   }
 }
 
-const waitForOperator = () => {
-  if (equation.length === 0) return
-  buttons.forEach((button) => {
-    if (!validOperators.includes(button.value)) {
-      button.disabled = true
-    } else if (["+","-","*","/"].includes(button.value)){
-      button.addEventListener("click", enableAllButtons)
-    } 
-  })
-}
 
-const enableAllButtons = () => {
-  buttons.forEach((button) => {
-    // Buttons currently have not been given functionality
-    // When enabled, remove html inline styling of "disabled" and remove from this array
-    if (["Msave", "Mnext", "Mcall", "^x", "x√",].includes(button.value)) return
 
-    button.disabled = false
-    button.removeEventListener("click", enableAllButtons)
-  })
-}
-
-function openParentheses() {
-
-}
-
-function closeParentheses() {
-
-}
-
-function validateZero() {
-  if (current.length >= 1) {
-    buildCurrentNumber("0")
-  }
-  else if (!current) {
-    buildCurrentNumber("0.")
-  }
-}
-
-function zeroDivisionError() {
+function zeroDivisionErrorText() {
   const chars = "@#$%^&*_+<>?"
   return `ZERO - DIV - MAKE - BROKE -`.split("").map((char) => {
     if (char === "-") {
@@ -205,101 +192,45 @@ function zeroDivisionError() {
   }).join("")
 }
 
-function validateDecimal() {
-  if (!current) {
-    buildCurrentNumber("0.")
-  }
-  else if (!current.includes(".")) {
-    buildCurrentNumber(".")
-  }
-}
-
-function validateOperator () {
-  if (
-    equation.length === 0 ||
-    "+*/".includes(equation.at(-1)) ||
-    equation.at(-1) === "-" ||
-    current.length === 0
-  ) {return false}
-  if (
-    equation.at(-1).includes("!") ||
-    equation.at(-1).includes("%") ||
-    equation.at(-1).includes("^") ||
-    equation.at(-1).includes("-") ||
-    current.length > 0
-  ) {return true}
-}
-
-function currentNumberToPercent() {
-  buildNextNumber("%")
-  waitForOperator()
-}
-
-function currentNumberToRoot() {
-  if (equation.length === 0) {
-    buildNextNumber("2√")
-  } else if (equation.at(-1).includes("√")) {
-    buildNextNumber(`${increaseRoot()}√`)
-  } else {
-    buildNextNumber("2√")
-  }
-}
-
-function increaseRoot() {
-  let root = Number(equation.pop().slice(0,-1))
-  return root += 1
-}
-function currentNumberToExponent() {
-  if (!current && !equation) return
-  if (equation.length === 0) {
-    buildNextNumber("^2")
-    waitForOperator()
-  } else  if (equation.at(-1).includes("^")){
-    buildNextNumber(`^${increaseExponent()}`)
-    waitForOperator()
-    return
-  } else {
-    buildNextNumber("^2")
-    waitForOperator()
-  }
-}
- function increaseExponent() {
-  let exponent = equation.pop().split("^")
-  exponent = Number(exponent[1])
-  return exponent += 1
- }
-
-function currentNumberToFactorial() {
-  buildNextNumber("!")
-  waitForOperator()
-}
-
-function currentNumberSignChange() {
-  if (!current || isNaN(current)) return
-  current = String(sign(Number(current)))
-  inputToScreen()
+function zeroDivisionErrorInterval() {
+  pressAnyKey = true
+  screen.innerHTML = zeroDivisionErrorText()
+  let blink = 1
+  const interval = setInterval(() => {
+    if (blink % 12 === 0) {
+      screen.innerHTML = ""
+      blink = 1
+    } else {
+      screen.innerHTML = zeroDivisionErrorText()
+      blink++
+    }
+    if (!pressAnyKey) {
+      clearInterval(interval)
+      inputToScreen()
+    }
+  }, 125)
 }
 
 function deleteLast() {
-  enableAllButtons()
-  screen.textContent = screen.textContent.slice(0, -1)
-  if (!current) {
-    current = String(equation.at(-1))
-    equation.splice(equation.length - 1, 1)
+  if (state === STATES.equals) {
+    state = equation[equation.length - 1].button.type
   }
-  current = current.slice(0, -1)
+  if (equation.pop().button.type === "decimal") decimalAvailable = true
+  if (equation.length) {
+    let last = equation.pop()
+    buttonIds[last.button.value].click()
+  } else {
+    state = STATES.open
+  }
+  current = screenHTML()
+  inputToScreen()
 }
 
 function clear() {
   screen.style.display = "none"
   screenClear.style.display = "flex"
-  const buttonState = []
+  clearing = true
   buttons.forEach(button => {
-    if (button.disabled) {
-      buttonState.push(true)
-    } else {
-      buttonState.push(false)
-    }
     if (button.classList.contains("clrButton")) {
       button.disabled = false
     } else {
@@ -313,23 +244,34 @@ function clear() {
   function clearY() {
     screen.style.display = "block"
     screenClear.style.display = "none"
-    screen.textContent = ""
+    buttons.forEach(button => {
+      if (button.classList.contains("clrButton")) {
+        button.disabled = true
+      } else {
+        button.disabled = false
+      }
+    })
     current = ""
-    equation.length = 0
-    enableAllButtons()
+    equation = []
+    state = STATES.open
+    decimalAvailable = true
+    clearing = false
     clearY_button.disabled = true
     clearN_button.disabled = true
     clearY_button.removeEventListener("click", clearY)
     clearN_button.removeEventListener("click", clearN)
+    inputToScreen()
   }
   
   function clearN() {
     screen.style.display = "block"
     screenClear.style.display = "none"
-    let i = 0
     buttons.forEach(button => {
-      button.disabled = buttonState[i]
-      i++
+      if (button.classList.contains("clrButton")) {
+        button.disabled = true
+      } else {
+        button.disabled = false
+      }
     })
     clearY_button.removeEventListener("click", clearY)
     clearN_button.removeEventListener("click", clearN)
@@ -340,114 +282,189 @@ function evaluate(equation) {
   let newEquation = [...equation]
   newEquation = evaluateFactPercRootExp(newEquation)
   newEquation = evaluateMulDiv(newEquation)
-  if (newEquation === 0) return 0 //check for zero division error
+  if (newEquation === "ERROR Divide by 0") return "ERROR Divide by 0"
   newEquation = evaluateAddSub(newEquation)
-  return String(newEquation[0])
+  return String(newEquation).split("")
+}
+
+function evaluateFactPercRootExp(equation) {
+  let result = []
+  for (let i= 0; i < equation.length; i++) {
+    switch (equation[i]) {
+      case "f":
+        result.push(factorial(result.pop()))
+        break
+      case "%":
+        result.push(percent(result.pop()))
+        break
+      case "r":
+        i++
+        result.push(root(equation[i]))
+        break
+      case "e":
+        result.push(exponent(result.pop()))
+        break
+      default:
+        result.push(equation[i])
+        break
+    }
+  }
+  return equation = [...result]
 }
 
 function evaluateMulDiv(equation) {
   let result = []
-  for (let i = 0; i < equation.length; i++) {
-    if (equation[i] === "*" || equation[i] === "/") {
-      const leftNumber = Number(result[result.length - 1])
-      const rightNumber = Number(equation[i + 1])
-
-      result.pop()
-
-      if (equation[i] === "*") {
+  for (let i= 0; i < equation.length; i++) {
+    switch (equation[i]) {
+      case "*": {
+        const leftNumber = Number(result.pop()) // removes last number from result
+        const rightNumber = Number(equation[++i]) // skips to next number in equation
         result.push(multiply(leftNumber, rightNumber))
-      } else {
-        if (rightNumber === 0) return 0 //check for zero division error
-        result.push(divide(leftNumber, rightNumber))
+        break
       }
-      i++
-    } else {
-      result.push(equation[i])
+      case "/": {
+        const leftNumber = Number(result.pop()) // removes last number from result
+        const rightNumber = Number(equation[++i]) // skips to next number in equation
+        if (rightNumber === 0) return "ERROR Divide by 0"
+        result.push(divide(leftNumber, rightNumber))
+        break
+      }
+      default:
+        result.push(equation[i])
     }
   }
-  equation.length = 0
   return equation = [...result]
 }
 
 function evaluateAddSub(equation) {
   let result = []
-  for (let i = 0; i < equation.length; i++) {
-    if (equation[i] === "+" || equation[i] === "-") {
-      const leftNumber = Number(result[result.length - 1])
-      const rightNumber = Number(equation[i + 1])
-
-      result.pop()
-
-      if (equation[i] === "+") {
+  for (let i= 0; i < equation.length; i++) {
+    switch (equation[i]) {
+      case "+": {
+        const leftNumber = Number(result.pop()) // removes last number from result
+        const rightNumber = Number(equation[++i]) // skips to next number in equation
         result.push(add(leftNumber, rightNumber))
-      } else {
-        result.push(subtract(leftNumber, rightNumber))
+        break
       }
-      i++
-    } else {
-      result.push(equation[i])
+      case "-": {
+        const leftNumber = Number(result.pop()) // removes last number from result
+        const rightNumber = Number(equation[++i]) // skips to next number in equation
+        result.push(subtract(leftNumber, rightNumber))
+        break
+      }
+      default:
+        result.push(equation[i])
     }
   }
-  equation.length = 0
-  return equation = [...result]
-}
-
-function evaluateFactPercRootExp(equation) {
-  let result = []
-  for (let i = 0; i < equation.length; i++) {
-    if (equation[i] === "!") {
-      result.push(factorial(Number(result.pop())))
-    } else if (equation[i] === "%") {
-      result.push(percent(Number(result.pop())))
-    } else if (equation[i].includes("√")) {
-      i++
-      result.push(root(Number(equation[i]), Number(equation[i-1].slice(0,-1))))
-    } else if (equation[i].includes("^")) {
-      result.push(exponent(Number(result.pop()), Number(equation[i].slice(1))))
-    } else {
-      result.push(equation[i])
-    }
-  }
-  equation.length = 0
   return equation = [...result]
 }
 
 function equals() {
-  if (current) {
-    equation.push(current)
-    current = ""
+  if (!equation.length) return
+  if (state === STATES.operator) {equation.pop()}
+  decimalAvailable = true
+  let result = []
+  let num = ""
+
+  // Parse numbers and operators
+  for (let article of equation) {
+    if (["number", "decimal", ].includes(article.button.type)) {
+      num += article.button.value
+    } else if (article.button.type === "sign") {
+      num += "-"
+    } else {
+      if (num) {result.push(Number(num))}
+      num = ""
+      result.push(article.button.value)
+    }
   }
-  if (equation.length === 0) return
-  current = evaluate(equation)
-  if (current === 0) {
-    equation.length = 0
-    current = ""
-    screen.textContent = zeroDivisionError()
-    let blink = 1
-    const interval = setInterval(() => {
-      if (current === "") {
-        if (blink % 12 === 0) {  
-          screen.textContent = ""
-          blink = 1
-        } else {
-          screen.textContent = zeroDivisionError()
-          blink++
-        }
-      } else {
-        clearInterval(interval)
-      }
-    }, 125)
-    return
+  if (num) result.push(Number(num))
+
+  result = evaluate(result)
+  
+  current = ""
+  equation = []
+  state = STATES.equals
+  
+  if (result === "ERROR Divide by 0") {
+    zeroDivisionErrorInterval()
+  } else {
+    for (number of result) {
+      if (number === "-") state = STATES.sign
+      buttonIds[number].click()      
+    }
+    inputToScreen()
   }
-  equation.length = 0
-  inputToScreen()
-  enableAllButtons()
+  state = STATES.equals
 }
 
-let current = ""
-let answer
-// const equation = ["25","+","5","*","(","6","+","3",")","5","-","16","/","2"]
-const equation = []
-const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","(",")","^","!","backspace","delete","enter","s","r", "y", "n",] //MEM, M+, M
-const validOperators = ["+","-","*","/","=","%","(",")","^","!","backspace","delete","enter","s","r",]
 
+const VALUES = {
+  number0: {value: "0", html: "0", type: "number",},
+  number1: {value: "1", html: "1", type: "number",},
+  number2: {value: "2", html: "2", type: "number",},
+  number3: {value: "3", html: "3", type: "number",},
+  number4: {value: "4", html: "4", type: "number",},
+  number5: {value: "5", html: "5", type: "number",},
+  number6: {value: "6", html: "6", type: "number",},
+  number7: {value: "7", html: "7", type: "number",},
+  number8: {value: "8", html: "8", type: "number",},
+  number9: {value: "9", html: "9", type: "number",},
+
+  decimal: {value: ".", html: ".", type: "decimal"},
+  
+  add: {value: "+", html: "+", type: "operator"},
+  subtract: {value: "-", html: "-", type: "operator"},
+  multiply: {value: "*", html: "*", type: "operator"},
+  divide: {value: "/", html: "/", type: "operator"},
+  
+  sign: {value: "s", html: "<sub><sup>-</sup></sub>", type: "sign"},
+  
+  percent: {value: "%", html: "%", type: "percent"},
+  exponent: {value: "e", html: "<sub><sup><sup>2</sup></sup></sub>", type: "exponent"},
+  root: {value: "r", html: "<sub><sup><sup>2</sup></sup></sub>√", type: "root"},
+  factorial: {value: "f", html: "!", type: "factorial"},
+
+  clear: {},
+  delete: {},
+  equals: {type: "equals"},
+}
+
+const STATES = {
+  open: ["number", "decimal", "root", ],
+  number: ["number", "decimal", "operator", "sign", "percent", "exponent", "factorial", ],
+  decimal: ["number", ],
+  operator: ["number", "decimal", "root", "operator", ],
+  percent: ["operator", "sign", "percent", "exponent", "factorial", ],
+  exponent: ["operator", "sign", "percent", "exponent", "factorial", ],
+  root: ["number", "decimal", "root", ],
+  factorial: ["operator", "sign", "percent", "exponent", "factorial", ],
+  sign: ["number"],
+  equals: ["number", "operator", "sign", "percent", "exponent", "root", "factorial",  ]
+}
+
+const buttonIds = {
+  "0": number0_button,
+  "1": number1_button,
+  "2": number2_button,
+  "3": number3_button,
+  "4": number4_button,
+  "5": number5_button,
+  "6": number6_button,
+  "7": number7_button,
+  "8": number8_button,
+  "9": number9_button,
+  ".": decimal_button,
+  "-": sign_button,
+}
+
+
+let state = STATES.open
+let decimalAvailable = true
+let pressAnyKey = false
+let clearing = false
+
+let current = ""
+let equation = []
+const validKeys = ["0","1","2","3","4","5","6","7","8","9","+","-","*","/",".","=","%","^","!","backspace","delete","enter","s","r", "y", "n",]
+inputToScreen()
